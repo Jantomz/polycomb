@@ -47,7 +47,6 @@ const Form = ({ user }) => {
     const fetchTemplate = async () => {
       try {
         const template = await getTemplate({ templateId });
-        console.log(template);
         setTemplate(template);
       } catch (error) {
         console.error("Failed to fetch template:", error);
@@ -58,7 +57,6 @@ const Form = ({ user }) => {
     const fetchForms = async () => {
       try {
         const forms = await getTemplateForms({ templateId });
-        console.log(forms);
         setForms(forms);
       } catch (error) {
         console.error("Failed to fetch forms:", error);
@@ -72,15 +70,10 @@ const Form = ({ user }) => {
 
   return (
     <div className="p-6 bg-yellow-50 min-h-screen">
-      <h1 className="text-3xl font-bold text-yellow-700 mb-4">
-        Form {templateId}
-      </h1>
+      <h1 className="text-3xl font-bold text-yellow-700 mb-4">Form Preview</h1>
       {error && <div className="text-red-500 mb-4">{error}</div>}
       {template && (
         <div className="mb-8">
-          <h1 className="text-2xl font-semibold text-yellow-600 mb-2">
-            Form Preview
-          </h1>
           <h3 className="text-xl text-yellow-700">{template.title}</h3>
           <p className="text-yellow-600 mb-4">{template.description}</p>
           <form onSubmit={(e) => e.preventDefault()} className="space-y-4">

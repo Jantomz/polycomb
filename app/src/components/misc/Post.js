@@ -38,14 +38,14 @@ const Post = ({ post }) => {
           ))}
       </div>
 
-      <div className="text-left p-12">
+      <div className="text-left p-4 md:p-8 lg:p-12">
         {Array.isArray(content) &&
           content.map((contentItem, index) => (
             <div
               key={index}
               className="mb-4 flex flex-col justify-center items-center"
             >
-              <p>{contentItem}</p>
+              <p className="text-center">{contentItem}</p>
               {images[index] && (
                 <img
                   src={images[index]}
@@ -55,10 +55,10 @@ const Post = ({ post }) => {
               )}
             </div>
           ))}
-        <div className="flex flex-wrap justify-center gap-12">
+        <div className="flex flex-wrap justify-center gap-4 md:gap-8 lg:gap-12">
           {Array.isArray(images) &&
             images.slice(content.length).map((image, index) => (
-              <div key={index} className="mb-4 ">
+              <div key={index} className="mb-4">
                 <img
                   src={image}
                   alt="post"
@@ -73,7 +73,7 @@ const Post = ({ post }) => {
               key={index}
               className="mb-4 flex flex-col justify-center items-center"
             >
-              <p>{contentItem}</p>
+              <p className="text-center">{contentItem}</p>
             </div>
           ))}
       </div>

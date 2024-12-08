@@ -3,21 +3,11 @@ import { Link, useParams } from "react-router-dom";
 import useApi from "../../../hooks/useApi.js";
 
 const CompetitionDash = ({ user }) => {
-  const {
-    getCompetition,
-    getCompetitionTemplates,
-    getUserForms,
-    getFiles,
-    getPosts,
-    getWordlists,
-  } = useApi();
-  const [code, setCode] = useState(useParams().code);
+  const { getCompetition, getUserForms, getWordlists } = useApi();
 
+  const { code } = useParams();
   const [competition, setCompetition] = useState(null);
-  const [templates, setTemplates] = useState([]);
   const [forms, setForms] = useState([]);
-  const [files, setFiles] = useState([]);
-  const [posts, setPosts] = useState([]);
   const [wordlists, setWordlists] = useState([]);
   const [error, setError] = useState(null);
 
@@ -31,18 +21,6 @@ const CompetitionDash = ({ user }) => {
       }
     };
     fetchCompetition();
-
-    const fetchTemplates = async () => {
-      try {
-        const templates = await getCompetitionTemplates({
-          competitionCode: code,
-        });
-        setTemplates(templates);
-      } catch (err) {
-        setError("Failed to fetch competition templates.");
-      }
-    };
-    fetchTemplates();
 
     const fetchForms = async () => {
       try {
@@ -70,8 +48,8 @@ const CompetitionDash = ({ user }) => {
 
   return (
     <div className="bg-yellow-50 text-gray-800">
-      <div className="flex">
-        <aside className="w-64 bg-yellow-200 p-4">
+      <div className="flex flex-col md:flex-row">
+        <aside className="w-full md:w-64 bg-yellow-200 p-4">
           <h1 className="text-2xl font-bold mb-4">General Actions</h1>
           <nav className="space-y-2 mb-6">
             <Link

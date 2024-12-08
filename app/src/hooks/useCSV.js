@@ -11,22 +11,17 @@ const useCSV = () => {
       const requiredHeaders = [
         "Word",
         "Pronunciation",
-        "Part Of Speech",
+        "Part of Speech",
         "Definition",
         "Etymology",
         "Sentence",
-        "Notes",
       ].map((header) => header.trim().toLowerCase());
-
-      console.log("Headers: ", headers);
-      console.log("Required Headers: ", requiredHeaders);
-      console.log("Lines: ", lines);
 
       if (!requiredHeaders.every((header) => headers.includes(header))) {
         throw new Error("CSV file is missing required headers");
       }
 
-      return lines.slice(1).map((line, lineIndex) => {
+      return lines.slice(1).map((line) => {
         const values = [];
         let current = "";
         let inQuotes = false;

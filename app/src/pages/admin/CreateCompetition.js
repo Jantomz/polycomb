@@ -65,7 +65,7 @@ const CreateCompetition = ({ user, setUserData }) => {
       );
 
       if (startTemplate) {
-        const templateRes = await createTemplate({
+        await createTemplate({
           title: "General Information Form",
           competitionCode: res.code,
           creatorId: user.uid,
@@ -77,8 +77,6 @@ const CreateCompetition = ({ user, setUserData }) => {
             { name: "Grade", type: "number", required: true },
           ],
         });
-
-        console.log("Template created: ", templateRes);
       }
 
       if (res) {

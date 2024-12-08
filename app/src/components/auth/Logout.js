@@ -5,7 +5,6 @@ const Logout = () => {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      console.log("Logged out successfully");
     } catch (err) {
       if (err.code === "auth/network-request-failed") {
         console.error("Network error, please try again later.");

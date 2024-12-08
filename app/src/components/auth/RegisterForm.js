@@ -13,7 +13,6 @@ const RegisterForm = () => {
     setError(null); // Clear previous errors
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      console.log("Account created");
     } catch (err) {
       switch (err.code) {
         case "auth/email-already-in-use":

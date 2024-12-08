@@ -22,15 +22,6 @@ const useApi = () => {
     endDate,
     admins
   ) => {
-    console.log(
-      "Received:",
-      title,
-      description,
-      code,
-      startDate,
-      endDate,
-      admins
-    );
     try {
       const response = await apiRequest(`${BASE_URL}/competition`, {
         method: "POST",
@@ -56,7 +47,6 @@ const useApi = () => {
   };
 
   const addCompetition = async ({ code, userId }) => {
-    console.log("Adding competition to user: ", code, userId);
     return apiRequest(`${BASE_URL}/user/add-competition`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -65,7 +55,6 @@ const useApi = () => {
   };
 
   const getUserCompetitions = async ({ userId }) => {
-    console.log("Getting competitions for user: ", userId);
     return apiRequest(`${BASE_URL}/user/competitions/${userId}`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
@@ -73,7 +62,6 @@ const useApi = () => {
   };
 
   const getCompetition = async ({ code }) => {
-    console.log("Getting competition: ", code);
     return apiRequest(`${BASE_URL}/competition/${code}`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
@@ -81,7 +69,6 @@ const useApi = () => {
   };
 
   const addParticipant = async ({ code, userId }) => {
-    console.log("Adding participant to competition: ", code, userId);
     return apiRequest(`${BASE_URL}/competition/add-participant`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -90,7 +77,6 @@ const useApi = () => {
   };
 
   const updateSchedule = async ({ code, schedule }) => {
-    console.log("Updating schedule for competition: ", code, schedule);
     return apiRequest(`${BASE_URL}/competition/update-schedule`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -104,7 +90,6 @@ const useApi = () => {
     competitionCode,
     fields,
   }) => {
-    console.log("Creating template with title: ", title);
     return apiRequest(`${BASE_URL}/form/create-template`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -113,7 +98,6 @@ const useApi = () => {
   };
 
   const getCompetitionTemplates = async ({ competitionCode }) => {
-    console.log("Getting forms for competition: ", competitionCode);
     return apiRequest(
       `${BASE_URL}/form/competition-templates/${competitionCode}`,
       {
@@ -124,7 +108,6 @@ const useApi = () => {
   };
 
   const getTemplate = async ({ templateId }) => {
-    console.log("Getting template: ", templateId);
     return apiRequest(`${BASE_URL}/form/templates/${templateId}`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
@@ -132,15 +115,12 @@ const useApi = () => {
   };
 
   const submitForm = async ({ templateId, answers, signature, uid }) => {
-    console.log("Submitting form: ", templateId, answers, signature);
     const template = await getTemplate({ templateId });
 
     if (!template) {
       console.error("Template not found");
       return;
     }
-
-    console.log("Template: ", template);
 
     const title = template.title;
     const creatorId = uid;
@@ -163,7 +143,6 @@ const useApi = () => {
   };
 
   const getUserForms = async ({ competitionCode, userId }) => {
-    console.log("Getting forms for user: ", competitionCode, userId);
     return apiRequest(
       `${BASE_URL}/form/user-forms/${competitionCode}/${userId}`,
       {
@@ -174,7 +153,6 @@ const useApi = () => {
   };
 
   const getTemplateForms = async ({ templateId }) => {
-    console.log("Getting forms for template: ", templateId);
     return apiRequest(`${BASE_URL}/form/template-forms/${templateId}`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
@@ -182,7 +160,6 @@ const useApi = () => {
   };
 
   const updateTimeline = async ({ code, timeline }) => {
-    console.log("Updating timeline for competition: ", code, timeline);
     return apiRequest(`${BASE_URL}/competition/update-timeline`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -191,7 +168,6 @@ const useApi = () => {
   };
 
   const updateChecklist = async ({ code, checklist }) => {
-    console.log("Updating checklist for competition: ", code, checklist);
     return apiRequest(`${BASE_URL}/competition/update-checklist`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -200,9 +176,6 @@ const useApi = () => {
   };
 
   const uploadFile = async ({ file, creatorId, competitionCode }) => {
-    console.log("Uploading file: ", file);
-    console.log("Creator ID: ", creatorId);
-    console.log("Competition Code: ", competitionCode);
     const formData = new FormData();
     formData.append("file", file);
     formData.append("creatorId", creatorId);
@@ -215,14 +188,12 @@ const useApi = () => {
   };
 
   const getFiles = async ({ competitionCode }) => {
-    console.log("Getting files for competition: ", competitionCode);
     return apiRequest(`${BASE_URL}/file/competition/${competitionCode}`, {
       method: "GET",
     });
   };
 
   const getPosts = async ({ competitionCode }) => {
-    console.log("Getting posts for competition: ", competitionCode);
     return apiRequest(`${BASE_URL}/post/competition/${competitionCode}`, {
       method: "GET",
     });
@@ -237,7 +208,6 @@ const useApi = () => {
     description,
     images,
   }) => {
-    console.log("Creating post: ", title, content, creatorId, competitionCode);
     return apiRequest(`${BASE_URL}/post/`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -254,12 +224,10 @@ const useApi = () => {
   };
 
   const deletePost = async ({ postId }) => {
-    console.log("Deleting post: ", postId);
     return apiRequest(`${BASE_URL}/post/${postId}`, { method: "DELETE" });
   };
 
   const updatePost = async ({ postId, post }) => {
-    console.log("Updating post: ", postId, post);
     return apiRequest(`${BASE_URL}/post/${postId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -274,14 +242,6 @@ const useApi = () => {
     creatorId,
     words,
   }) => {
-    console.log(
-      "Creating wordlist: ",
-      title,
-      description,
-      competitionCode,
-      creatorId,
-      words
-    );
     return apiRequest(`${BASE_URL}/wordlist`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -296,19 +256,16 @@ const useApi = () => {
   };
 
   const getWordlists = async ({ competitionCode }) => {
-    console.log("Getting wordlists for competition: ", competitionCode);
     return apiRequest(`${BASE_URL}/wordlist/competition/${competitionCode}`, {
       method: "GET",
     });
   };
 
   const getWord = async ({ wordId }) => {
-    console.log("Getting word: ", wordId);
     return apiRequest(`${BASE_URL}/wordlist/word/${wordId}`, { method: "GET" });
   };
 
   const getWordlist = async ({ competitionCode, wordlistId }) => {
-    console.log("Getting wordlist: ", competitionCode, wordlistId);
     return apiRequest(
       `${BASE_URL}/wordlist/competition/${competitionCode}/${wordlistId}`,
       { method: "GET" }
@@ -316,7 +273,6 @@ const useApi = () => {
   };
 
   const uploadAudio = async ({ audio, creatorId, wordId, oldAudioId }) => {
-    console.log("Posting audio: ", audio);
     const formData = new FormData();
     formData.append("audio", audio);
     formData.append("creatorId", creatorId);
@@ -339,16 +295,9 @@ const useApi = () => {
           method: "DELETE",
         });
       }
-
-      console.log("Updated word with audio: ", wordId);
     }
 
     return data;
-  };
-
-  const getAudioStream = async ({ id }) => {
-    console.log("Getting audio stream: ", id);
-    return apiRequest(`${BASE_URL}/audio/${id}`, { method: "GET" });
   };
 
   const setWordlistPractice = async ({
@@ -357,13 +306,6 @@ const useApi = () => {
     order,
     currentIndex,
   }) => {
-    console.log(
-      "Setting practice for user: ",
-      userId,
-      wordlistId,
-      order,
-      currentIndex
-    );
     return apiRequest(`${BASE_URL}/user/set-wordlist-practice`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -372,14 +314,12 @@ const useApi = () => {
   };
 
   const getUsers = async ({ competitionCode }) => {
-    console.log("Getting users: ", competitionCode);
     return apiRequest(`${BASE_URL}/user/competition/${competitionCode}`, {
       method: "GET",
     });
   };
 
   const generateWordFrequency = async ({ word }) => {
-    console.log("Generating word frequency: ", word);
     return apiRequest(`${BASE_URL}/tool/generate-difficulty-rating/${word}`, {
       method: "GET",
     });
@@ -394,19 +334,16 @@ const useApi = () => {
   };
 
   const deleteTemplate = async ({ templateId }) => {
-    console.log("Deleting template: ", templateId);
     return apiRequest(`${BASE_URL}/form/templates/${templateId}`, {
       method: "DELETE",
     });
   };
 
   const deleteFile = async ({ fileId }) => {
-    console.log("Deleting file", fileId);
     return apiRequest(`${BASE_URL}/file/${fileId}`, { method: "DELETE" });
   };
 
   const deleteWord = async ({ wordId, audioId }) => {
-    console.log("Deleting word: ", wordId);
     const data = await apiRequest(`${BASE_URL}/wordlist/word/${wordId}`, {
       method: "DELETE",
     });
@@ -419,7 +356,6 @@ const useApi = () => {
   };
 
   const deleteWordlist = async ({ wordlistId }) => {
-    console.log("Deleting wordlist: ", wordlistId);
     return apiRequest(`${BASE_URL}/wordlist/wordlist/${wordlistId}`, {
       method: "DELETE",
     });
@@ -452,7 +388,6 @@ const useApi = () => {
     getWord,
     getWordlist,
     uploadAudio,
-    getAudioStream,
     setWordlistPractice,
     getUsers,
     generateWordFrequency,

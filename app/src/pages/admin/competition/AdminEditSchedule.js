@@ -16,7 +16,6 @@ const AdminEditSchedule = () => {
     const fetchCompetition = async () => {
       try {
         const competition = await getCompetition({ code });
-        console.log(competition);
         setCompetition(competition);
         if (competition?.schedule) {
           setEvents(competition.schedule);
@@ -85,7 +84,6 @@ const AdminEditSchedule = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(events);
 
     const submitSchedule = async () => {
       try {
@@ -142,46 +140,50 @@ const AdminEditSchedule = () => {
               placeholder="Event Description"
               required
             />
-            <input
-              autoComplete="off"
-              type="date"
-              id={`event-${index}-startDate`}
-              value={event.startDate}
-              onChange={(e) =>
-                handleEventChange(index, "startDate", e.target.value)
-              }
-              className="w-full p-2 border border-yellow-300 rounded"
-            />
-            <input
-              autoComplete="off"
-              type="date"
-              id={`event-${index}-endDate`}
-              value={event.endDate}
-              onChange={(e) =>
-                handleEventChange(index, "endDate", e.target.value)
-              }
-              className="w-full p-2 border border-yellow-300 rounded"
-            />
-            <input
-              autoComplete="off"
-              type="time"
-              id={`event-${index}-startTime`}
-              value={event.startTime}
-              onChange={(e) =>
-                handleEventChange(index, "startTime", e.target.value)
-              }
-              className="w-full p-2 border border-yellow-300 rounded"
-            />
-            <input
-              autoComplete="off"
-              type="time"
-              id={`event-${index}-endTime`}
-              value={event.endTime}
-              onChange={(e) =>
-                handleEventChange(index, "endTime", e.target.value)
-              }
-              className="w-full p-2 border border-yellow-300 rounded"
-            />
+            <div className="flex flex-col md:flex-row gap-4">
+              <input
+                autoComplete="off"
+                type="date"
+                id={`event-${index}-startDate`}
+                value={event.startDate}
+                onChange={(e) =>
+                  handleEventChange(index, "startDate", e.target.value)
+                }
+                className="w-full p-2 border border-yellow-300 rounded"
+              />
+              <input
+                autoComplete="off"
+                type="date"
+                id={`event-${index}-endDate`}
+                value={event.endDate}
+                onChange={(e) =>
+                  handleEventChange(index, "endDate", e.target.value)
+                }
+                className="w-full p-2 border border-yellow-300 rounded"
+              />
+            </div>
+            <div className="flex flex-col md:flex-row gap-4">
+              <input
+                autoComplete="off"
+                type="time"
+                id={`event-${index}-startTime`}
+                value={event.startTime}
+                onChange={(e) =>
+                  handleEventChange(index, "startTime", e.target.value)
+                }
+                className="w-full p-2 border border-yellow-300 rounded"
+              />
+              <input
+                autoComplete="off"
+                type="time"
+                id={`event-${index}-endTime`}
+                value={event.endTime}
+                onChange={(e) =>
+                  handleEventChange(index, "endTime", e.target.value)
+                }
+                className="w-full p-2 border border-yellow-300 rounded"
+              />
+            </div>
             <button
               onClick={() => removeEvent(index)}
               type="button"
@@ -191,7 +193,7 @@ const AdminEditSchedule = () => {
             </button>
           </div>
         ))}
-        <div className="flex gap-4 m-auto w-max">
+        <div className="flex flex-col md:flex-row gap-4 m-auto w-max">
           <button
             onClick={addEvent}
             type="button"

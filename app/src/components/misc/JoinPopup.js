@@ -1,6 +1,6 @@
 import useApi from "../../hooks/useApi.js";
 
-const JoinPopup = ({ user, userData, setUserData, setShowJoinPopup }) => {
+const JoinPopup = ({ user, setUserData, setShowJoinPopup }) => {
   const { addCompetition, addParticipant } = useApi();
 
   const handleJoinCompetition = async (e) => {
@@ -34,8 +34,6 @@ const JoinPopup = ({ user, userData, setUserData, setShowJoinPopup }) => {
 
       setUserData(updatedUser);
       setShowJoinPopup(false);
-
-      console.log("Successfully joined competition:", updatedUser);
     } catch (error) {
       console.error("Unexpected error:", error);
       alert("An unexpected error occurred. Please try again later.");
@@ -43,7 +41,7 @@ const JoinPopup = ({ user, userData, setUserData, setShowJoinPopup }) => {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-yellow-100 bg-opacity-75">
+    <div className="fixed inset-0 flex items-center justify-center bg-yellow-100 bg-opacity-75 z-50">
       <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
         <h1 className="text-2xl font-bold text-yellow-600 mb-4">
           Join a Competition

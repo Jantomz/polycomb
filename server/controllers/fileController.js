@@ -4,7 +4,6 @@ const { GridFSBucket } = require("mongodb");
 
 const uploadFile = async (req, res) => {
   try {
-    console.log("Uploading file: ", req.file);
     if (!req.file) {
       return res.status(400).json({ message: "No file uploaded" });
     }
@@ -15,14 +14,6 @@ const uploadFile = async (req, res) => {
     if (!creatorId || !competitionCode) {
       return res.status(400).json({ message: "Missing required fields" });
     }
-
-    console.log(
-      "Creating file: ",
-      filename,
-      creatorId,
-      competitionCode,
-      fileId
-    );
 
     const file = new File({
       filename,
@@ -49,8 +40,6 @@ const uploadFile = async (req, res) => {
 
 const getFiles = async (req, res) => {
   try {
-    console.log("Getting all files");
-
     const { competitionCode } = req.params;
 
     if (!competitionCode) {
@@ -82,14 +71,10 @@ const getFileStream = async (req, res) => {
       return res.status(400).json({ message: "File is not a PDF" });
     }
 
-    console.log("Getting file: ", file);
-
     const bucket = new GridFSBucket(mongoose.connection.db, {
       bucketName: "uploads",
     });
     const readStream = bucket.openDownloadStreamByName(file.filename);
-
-    console.log("Streaming file: ", file.filename);
 
     res.set("Content-Type", file.contentType);
 
@@ -113,7 +98,6 @@ const deleteFile = async (req, res) => {
   const { id: fileId } = req.params;
 
   try {
-    console.log("Deleting file: ", fileId);
     const bucket = new GridFSBucket(mongoose.connection.db, {
       bucketName: "uploads",
     });
@@ -121,11 +105,9 @@ const deleteFile = async (req, res) => {
     bucket.delete(new mongoose.Types.ObjectId(fileId), async (err) => {
       if (err) {
         console.error("Error deleting file from GridFS:", err);
-        return res
-          .status(500)
-          .json({
-            message: "An error occurred while deleting the file from GridFS",
-          });
+        return res.status(500).json({
+          message: "An error occurred while deleting the file from GridFS",
+        });
       }
 
       try {
@@ -135,16 +117,13 @@ const deleteFile = async (req, res) => {
             .status(404)
             .json({ message: "File not found in database" });
         }
-        console.log("Deleted file: ", fileId);
         res.status(200).json({ message: "File deleted successfully" });
       } catch (error) {
         console.error("Error deleting file from database:", error);
-        res
-          .status(500)
-          .json({
-            message:
-              "An error occurred while deleting the file from the database",
-          });
+        res.status(500).json({
+          message:
+            "An error occurred while deleting the file from the database",
+        });
       }
     });
   } catch (error) {

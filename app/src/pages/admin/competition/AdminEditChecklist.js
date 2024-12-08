@@ -8,7 +8,6 @@ const AdminEditChecklist = () => {
   const { code } = useParams();
   const [competition, setCompetition] = useState(null);
   const [conditions, setConditions] = useState([]);
-  const [templates, setTemplates] = useState([]);
   const navigate = useNavigate();
   const [error, setError] = useState(null);
 
@@ -16,7 +15,6 @@ const AdminEditChecklist = () => {
     const fetchCompetition = async () => {
       try {
         const competition = await getCompetition({ code });
-        console.log(competition);
         setCompetition(competition);
         if (competition?.checklist) {
           setTasks(competition.checklist);
@@ -31,8 +29,6 @@ const AdminEditChecklist = () => {
     const fetchForms = async () => {
       try {
         const forms = await getCompetitionTemplates({ competitionCode: code });
-        console.log("Condition to complete: ", forms);
-        setTemplates(forms);
         setConditions(
           forms.map((form) => `COMPLETE ${form.title} (${form._id})`)
         );
@@ -70,7 +66,6 @@ const AdminEditChecklist = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(tasks);
 
     const submitChecklist = async () => {
       try {
@@ -144,6 +139,12 @@ const AdminEditChecklist = () => {
               required
               className="w-full p-2 border border-yellow-300 rounded"
             />
+            <label
+              htmlFor={`task-${index}-condition`}
+              className="block text-yellow-700 font-semibold"
+            >
+              Condition to Complete
+            </label>
             <select
               autoComplete="off"
               value={task.condition}
@@ -168,7 +169,7 @@ const AdminEditChecklist = () => {
             </button>
           </div>
         ))}
-        <div className="flex gap-4 m-auto w-max">
+        <div className="flex flex-col sm:flex-row gap-4 m-auto w-max">
           <button
             onClick={addEvent}
             type="button"

@@ -27,9 +27,7 @@ const AdminCreateWordlist = ({ user }) => {
     if (file) {
       try {
         setError(null);
-        console.log(file);
         const words = await getWords(file);
-        console.log(words);
         setWords(words);
       } catch (err) {
         console.error("Error uploading file:", err);
@@ -45,16 +43,20 @@ const AdminCreateWordlist = ({ user }) => {
   };
 
   const handleCreateWordlist = async () => {
-    console.log(
-      "Creating wordlist",
-      title,
-      description,
-      competitionCode,
-      words
-    );
-
     setLoading(true);
     setError(null);
+
+    if (!title) {
+      setError("Please enter a title for the wordlist.");
+      setLoading(false);
+      return;
+    }
+
+    if (!description) {
+      setError("Please enter a description for the wordlist.");
+      setLoading(false);
+      return;
+    }
 
     try {
       const wordlist = await createWordlist({
@@ -66,7 +68,6 @@ const AdminCreateWordlist = ({ user }) => {
       });
 
       navigate(`/competition/${competitionCode}/wordlist/${wordlist._id}`);
-      console.log(wordlist);
     } catch (err) {
       console.error("Error creating wordlist:", err);
       if (err.response && err.response.data) {
@@ -91,6 +92,7 @@ const AdminCreateWordlist = ({ user }) => {
           className="w-full p-2 mb-2 border border-yellow-500 rounded"
           placeholder="Title"
           autoComplete="off"
+          disabled={loading}
         />
         <input
           type="text"
@@ -101,6 +103,7 @@ const AdminCreateWordlist = ({ user }) => {
           className="w-full p-2 mb-2 border border-yellow-500 rounded"
           placeholder="Description"
           autoComplete="off"
+          disabled={loading}
         />
         <input
           type="file"
@@ -108,20 +111,29 @@ const AdminCreateWordlist = ({ user }) => {
           onChange={handleFileChange}
           className="w-full p-2 mb-2 border border-yellow-500 rounded"
           autoComplete="off"
+          disabled={loading}
         />
         <button
           onClick={handleUpload}
           className="w-full p-2 mb-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+          disabled={loading}
         >
           Upload CSV
         </button>
         <button
           onClick={handleCreateWordlist}
           className="w-full p-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+          disabled={loading}
         >
           Create Wordlist
         </button>
       </div>
+
+      {loading && (
+        <div className="p-4 mb-4 bg-blue-200 text-blue-800 rounded">
+          Loading...
+        </div>
+      )}
 
       {error && (
         <div className="p-4 mb-4 bg-red-200 text-red-800 rounded">{error}</div>

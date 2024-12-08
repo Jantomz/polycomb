@@ -15,21 +15,9 @@ const competitionSchema = new Schema(
       index: true, // Adding index to make it a primary key
       match: [/^\d{5}$/, "Code must be 5 digits"], // Regex to ensure it's 5 digits
     },
-    wordlists: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Wordlist",
-      },
-    ],
     participants: [String],
     // The admins of the competition
     admins: [String],
-    posts: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Post",
-      },
-    ],
     checklist: {
       type: Array,
       default: [],
@@ -62,29 +50,6 @@ const competitionSchema = new Schema(
     description: {
       type: String,
       required: true,
-    },
-    // The rules of the competition
-    rules: {
-      type: String,
-    },
-    // The prizes of the competition
-    prizes: {
-      type: String,
-    },
-    // The status of the competition
-    status: {
-      type: String,
-      enum: ["active", "inactive"],
-      default: "active",
-    },
-    genFiles: {
-      type: Array,
-      default: [],
-    },
-
-    forms: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Form",
     },
   },
   { timestamps: true }

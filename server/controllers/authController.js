@@ -5,8 +5,6 @@ const User = require("../models/userModel");
 
 const mongoose = require("mongoose");
 
-// TODO: Add authentication through JWT or something to these routes
-
 // get all workouts
 const getUsers = async (req, res) => {
   const users = await User.find({}).sort({ createdAt: -1 }); // sorting in descending order
@@ -25,8 +23,15 @@ const createUser = async (req, res) => {
   if (!req.body || Object.keys(req.body).length === 0) {
     return res.status(400).json({ error: "Request body is missing or empty" });
   }
-  // TODO: Check validity of user body
-  console.log("Creating user: ", req.body);
+
+  const { name, email, password } = req.body;
+
+  if (!name || !email || !password) {
+    return res
+      .status(400)
+      .json({ error: "Name, email, and password are required" });
+  }
+
   const user = new User(req.body);
   await user.save();
   res.status(201).json(user);

@@ -37,8 +37,6 @@ const addCompetition = async (req, res) => {
   const { code, userId } = req.body;
 
   try {
-    console.log("Adding competition to user: ", code, userId);
-
     const user = await User.findOne({ uid: userId });
 
     if (!user) {
@@ -71,14 +69,6 @@ const setWordlistPractice = async (req, res) => {
   const { userId, wordlistId, order, currentIndex } = req.body;
 
   try {
-    console.log(
-      "Setting practice for user: ",
-      userId,
-      wordlistId,
-      order,
-      currentIndex
-    );
-
     const user = await User.findOne({ uid: userId });
 
     if (!user) {
@@ -92,8 +82,6 @@ const setWordlistPractice = async (req, res) => {
     if (wordlist) {
       wordlist.order = order;
       wordlist.currentIndex = currentIndex;
-      console.log("Updating wordlist practice", wordlist);
-      console.log("User", user);
     } else {
       user.wordlistsStudyDepth.push({
         wordlistId,
@@ -108,7 +96,6 @@ const setWordlistPractice = async (req, res) => {
       { new: true }
     );
 
-    console.log("Updated user", updatedUser);
     res.status(200).json(updatedUser);
   } catch (error) {
     console.error("Error setting wordlist practice:", error);
@@ -129,7 +116,6 @@ const getUsersFromCompetition = async (req, res) => {
     const users = await User.find({ uid: { $in: competition.participants } });
 
     res.status(200).json(users);
-    console.log("Users from competition", users);
   } catch (error) {
     console.error("Error fetching users from competition:", error);
     res.status(500).json({ error: "Failed to fetch users from competition" });

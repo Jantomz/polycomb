@@ -6,9 +6,7 @@ const GoogleLogin = () => {
   const handleGoogleLogin = async () => {
     const provider = new GoogleAuthProvider();
     try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      console.log("Google Login successful", user);
+      await signInWithPopup(auth, provider);
     } catch (error) {
       if (error.code === "auth/popup-closed-by-user") {
         console.error(

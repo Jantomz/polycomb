@@ -103,7 +103,7 @@ function App() {
   return (
     <Router>
       <Navbar user={user} />
-      <div className="App p-12 min-h-screen bg-yellow-100">
+      <div className="App p-12 max-md:p-4 min-h-screen bg-yellow-100">
         <BackButton />
         <Routes>
           <Route

@@ -17,9 +17,7 @@ const WordlistDifficulty = () => {
   const handleUpload = async () => {
     if (file) {
       try {
-        console.log(file);
         const words = await getWords(file);
-        console.log(words);
         setWords(words);
         const frequencies = await Promise.all(
           words.map(async (word) => {

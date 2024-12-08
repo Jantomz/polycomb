@@ -4,7 +4,6 @@ const { GridFSBucket } = require("mongodb");
 
 const uploadAudio = async (req, res) => {
   try {
-    console.log("Uploading audio: ", req.file);
     if (!req.file) {
       return res.status(400).json({ message: "No audio uploaded" });
     }
@@ -14,8 +13,6 @@ const uploadAudio = async (req, res) => {
     const wordId = req.body.wordId;
     const fileId = req.file.id;
     const fileType = req.file.mimetype;
-
-    console.log("Creating audio: ", filename, creatorId, wordId, fileId);
 
     const audio = new Audio({
       audioname: filename,
@@ -42,8 +39,6 @@ const uploadAudio = async (req, res) => {
 
 const getAudios = async (req, res) => {
   try {
-    console.log("Getting all audios");
-
     const competitionCode = req.params.competitionCode;
 
     if (!competitionCode) {
@@ -75,14 +70,10 @@ const getAudioStream = async (req, res) => {
       return res.status(400).json({ message: "File is not an audio file" });
     }
 
-    console.log("Getting audio: ", file);
-
     const bucket = new GridFSBucket(mongoose.connection.db, {
       bucketName: "audios",
     });
     const readStream = bucket.openDownloadStreamByName(file.filename);
-
-    console.log("Streaming audio: ", file.filename);
 
     res.set("Content-Type", file.contentType);
 
@@ -104,7 +95,6 @@ const getAudioStream = async (req, res) => {
 
 const deleteAudio = async (req, res) => {
   try {
-    console.log("Deleting audio: ", req.params.id);
     const bucket = new GridFSBucket(mongoose.connection.db, {
       bucketName: "audios",
     });
@@ -118,10 +108,9 @@ const deleteAudio = async (req, res) => {
       }
 
       try {
-        const fileRes = await Audio.findOneAndDelete({
+        await Audio.findOneAndDelete({
           audioId: req.params.id,
         });
-        console.log("Deleted audio: ", req.params.id);
         res.status(200).json({ message: "Audio deleted successfully" });
       } catch (err) {
         console.error("Error deleting audio from database:", err);

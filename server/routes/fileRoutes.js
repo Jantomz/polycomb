@@ -8,7 +8,6 @@ const {
   deleteFile,
 } = require("../controllers/fileController.js");
 
-const mongoose = require("mongoose");
 const path = require("path");
 const crypto = require("crypto");
 const multer = require("multer");

@@ -29,7 +29,6 @@ const WordlistPractice = ({ user, userData, setUserData }) => {
         order: orderUpload,
         currentIndex: currentIndexUpload,
       });
-      console.log("Uploaded wordlist practice", res);
       return res;
     } catch (err) {
       console.error("Error uploading wordlist practice", err);
@@ -45,8 +44,6 @@ const WordlistPractice = ({ user, userData, setUserData }) => {
       [indexArray[i], indexArray[j]] = [indexArray[j], indexArray[i]];
     }
 
-    console.log("IndexArray", indexArray);
-
     return indexArray;
   };
 
@@ -54,7 +51,6 @@ const WordlistPractice = ({ user, userData, setUserData }) => {
     setLoading(true);
     try {
       if (currentIndex === order.length - 1) {
-        console.log("End of wordlist");
         let currO = randomizeArrayIndex(wordlist.words);
         setCurrentIndex(0);
         setOrder(currO);
@@ -82,8 +78,6 @@ const WordlistPractice = ({ user, userData, setUserData }) => {
 
       setCurrentWord(word);
 
-      console.log("Next word", word);
-
       setUsersGuess("");
       setIsIncorrect(false);
     } catch (err) {
@@ -95,13 +89,9 @@ const WordlistPractice = ({ user, userData, setUserData }) => {
   };
 
   const checkWord = () => {
-    console.log("Checking word", usersGuess, currentWord.word);
-
     if (usersGuess === currentWord.word) {
-      console.log("Correct");
       nextWord();
     } else {
-      console.log("Incorrect");
       setIsIncorrect(true);
     }
   };
@@ -113,15 +103,12 @@ const WordlistPractice = ({ user, userData, setUserData }) => {
           competitionCode,
           wordlistId,
         });
-        console.log("Inner", innerWordlist);
         setWordlist(innerWordlist);
 
         let currIndex;
         let ord;
 
         let wordlistExistenceIndex = -1;
-
-        console.log("userData", userData);
 
         if (userData.wordlistsStudyDepth) {
           userData.wordlistsStudyDepth.forEach((element, index) => {
@@ -140,7 +127,6 @@ const WordlistPractice = ({ user, userData, setUserData }) => {
           }
           setCurrentIndex(currIndex);
           setOrder(ord);
-          console.log("Grabbing from userData", currIndex, ord);
         } else {
           currIndex = 0;
           ord = randomizeArrayIndex(innerWordlist.words);
@@ -155,12 +141,7 @@ const WordlistPractice = ({ user, userData, setUserData }) => {
         }
 
         const wordId = innerWordlist.words[ord[currIndex]];
-        console.log("WordId", wordId);
         const word = await getWord({ wordId });
-
-        if (!word.audioId) {
-          console.log("No audio");
-        }
 
         setCurrentWord(word);
       } catch (err) {
@@ -177,14 +158,13 @@ const WordlistPractice = ({ user, userData, setUserData }) => {
       currentWord &&
       currentIndex !== wordlist.words.length - 1
     ) {
-      console.log("No audio");
       nextWord();
     }
   }, [currentWord]);
 
   return (
     <div className="bg-yellow-100 min-h-screen flex flex-col items-center justify-center p-4">
-      <h1 className="text-4xl font-bold text-yellow-800 mb-6">
+      <h1 className="text-4xl font-bold text-yellow-800 mb-6 text-center">
         Wordlist Practice
       </h1>
       {error && <p className="text-red-500 mb-4">{error}</p>}

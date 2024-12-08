@@ -13,7 +13,6 @@ const LoginForm = () => {
     setError(null); // Clear previous errors
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      console.log("Logged in successfully");
     } catch (err) {
       switch (err.code) {
         case "auth/invalid-email":

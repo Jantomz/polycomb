@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import useApi from "../../../hooks/useApi.js";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import React from "react";
 
 const ViewWordlist = ({ user, userData }) => {
@@ -11,7 +11,6 @@ const ViewWordlist = ({ user, userData }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
   const pageSize = 20;
 
   useEffect(() => {
@@ -77,7 +76,7 @@ const ViewWordlist = ({ user, userData }) => {
             >
               <h3 className="text-xl font-bold text-yellow-800">{word.word}</h3>
               {word.audioId && (
-                <audio controls className="mt-2 mx-auto">
+                <audio controls className="mt-2 mx-auto w-full sm:w-auto">
                   <source
                     src={`http://localhost:8080/api/audio/${word.audioId}`}
                     type="audio/mpeg"
@@ -93,13 +92,13 @@ const ViewWordlist = ({ user, userData }) => {
               <p className="text-yellow-700">{word.notes}</p>
             </div>
           ))}
-          <div className="flex justify-center mt-4">
+          <div className="flex justify-center mt-4 flex-wrap">
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
               <button
                 key={page}
                 onClick={() => fetchWords(page)}
                 disabled={page === currentPage}
-                className={`px-4 py-2 mx-1 rounded ${
+                className={`px-4 py-2 mx-1 my-1 rounded ${
                   page === currentPage
                     ? "bg-yellow-600 text-white"
                     : "bg-yellow-200 text-yellow-800 hover:bg-yellow-300"

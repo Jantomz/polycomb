@@ -18,7 +18,6 @@ const Dashboard = ({ user, userData }) => {
       try {
         const competitions = await getUserCompetitions({ userId: user.uid });
         setCompetitions(competitions);
-        console.log(competitions);
       } catch (err) {
         console.error("Failed to fetch competitions:", err);
         setError("Failed to fetch competitions. Please try again later.");

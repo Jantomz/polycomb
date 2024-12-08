@@ -15,7 +15,6 @@ const AdminEditTimeline = () => {
     const fetchCompetition = async () => {
       try {
         const competition = await getCompetition({ code });
-        console.log(competition);
         setCompetition(competition);
         if (competition?.timeline) {
           setEvents(competition.timeline);
@@ -53,7 +52,6 @@ const AdminEditTimeline = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(events);
     const submitTimeline = async () => {
       try {
         await updateTimeline({ code, timeline: events });
@@ -135,7 +133,7 @@ const AdminEditTimeline = () => {
             </button>
           </div>
         ))}
-        <div className="flex gap-4 m-auto w-max">
+        <div className="flex flex-col sm:flex-row gap-4 m-auto w-max">
           <button
             onClick={addEvent}
             type="button"

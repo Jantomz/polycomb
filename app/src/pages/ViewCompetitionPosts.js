@@ -32,7 +32,7 @@ const ViewCompetitionPosts = () => {
 
   return (
     <div className="min-h-screen bg-yellow-50 p-6">
-      <h1 className="text-4xl font-bold text-yellow-700 mb-6">
+      <h1 className="text-4xl font-bold text-yellow-700 mb-6 max-md:text-xl">
         Competition Posts
       </h1>
       {loading ? (
@@ -44,7 +44,7 @@ const ViewCompetitionPosts = () => {
           <input
             type="text"
             placeholder="Search by tag or title"
-            className="p-2 border border-yellow-300 rounded"
+            className="p-2 border border-yellow-300 rounded w-full md:w-1/2 lg:w-1/3"
             onChange={(e) => {
               const query = e.target.value.toLowerCase();
               const filteredPosts = posts.filter(

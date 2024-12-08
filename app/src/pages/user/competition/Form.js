@@ -32,7 +32,7 @@ const Form = ({ user }) => {
     );
 
     try {
-      const form = await submitForm({
+      await submitForm({
         templateId,
         answers: data,
         signature: e.target.signature.value,

@@ -1,13 +1,16 @@
 import { Link } from "react-router-dom";
 import Logout from "../auth/Logout.js";
 
-const Navbar = ({ user, userData }) => {
+const Navbar = ({ user }) => {
   return (
     <nav className="w-screen bg-orange-300">
       <ul className="flex flex-col md:flex-row justify-between items-center gap-4 p-4">
         {user && (
           <>
-            <Link to="/" className="text-3xl font-bold">
+            <Link
+              to="/"
+              className="text-3xl font-bold hover:text-yellow-600 transition-all"
+            >
               Polycomb
             </Link>
             <div className="flex flex-col md:flex-row gap-3 items-center">
