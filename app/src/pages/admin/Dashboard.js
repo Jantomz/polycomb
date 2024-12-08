@@ -11,17 +11,24 @@ const Dashboard = ({ user, userData }) => {
   const navigate = useNavigate();
 
   const [competitions, setCompetitions] = useState([]);
+  const [error, setError] = useState(null);
+
   useEffect(() => {
     const performInitialRender = async () => {
-      const competitions = await getUserCompetitions({ userId: user.uid });
-      setCompetitions(competitions);
-      console.log(competitions);
+      try {
+        const competitions = await getUserCompetitions({ userId: user.uid });
+        setCompetitions(competitions);
+        console.log(competitions);
+      } catch (err) {
+        console.error("Failed to fetch competitions:", err);
+        setError("Failed to fetch competitions. Please try again later.");
+      }
     };
     performInitialRender();
   }, [userData]);
 
   return (
-    <div className="p-8  min-h-screen">
+    <div className="p-8 min-h-screen">
       <section className="mb-12">
         <h1 className="text-6xl font-bold mb-12 text-center text-gray-900">
           Admin Dashboard
@@ -29,6 +36,7 @@ const Dashboard = ({ user, userData }) => {
         <h2 className="text-3xl font-semibold mb-8 text-gray-800">
           Your Competitions
         </h2>
+        {error && <div className="text-red-500 text-center mb-4">{error}</div>}
         <div className="flex flex-wrap gap-4 justify-center">
           {competitions.map((competition) => (
             <button

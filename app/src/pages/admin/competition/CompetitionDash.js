@@ -19,6 +19,8 @@ const CompetitionDash = ({ user }) => {
   } = useApi();
   const [code, setCode] = useState(useParams().code);
 
+  const [file, setFile] = useState(null);
+
   const [forms, setForms] = useState([]);
 
   const [users, setUsers] = useState([]);
@@ -30,39 +32,54 @@ const CompetitionDash = ({ user }) => {
   const [templates, setTemplates] = useState([]);
   const [competition, setCompetition] = useState(null);
   const [loading, setLoading] = useState(false); // New loading state
+  const [error, setError] = useState(null); // New error state
 
   const fetchFiles = async () => {
-    console.log("Fetching files");
-    const files = await getFiles({ competitionCode: code });
-    console.log("files", files);
-    setFiles(files);
+    try {
+      console.log("Fetching files");
+      const files = await getFiles({ competitionCode: code });
+      console.log("files", files);
+      setFiles(files);
+    } catch (err) {
+      console.error("Error fetching files:", err);
+      setError("Failed to fetch files.");
+    }
   };
 
   useEffect(() => {
     const fetchCompetition = async () => {
-      const competition = await getCompetition({ code: code });
-      console.log(competition);
-      setCompetition(competition);
+      try {
+        const competition = await getCompetition({ code: code });
+        console.log(competition);
+        setCompetition(competition);
 
-      const users = await getUsers({ competitionCode: code });
-
-      setUsers(users);
+        const users = await getUsers({ competitionCode: code });
+        setUsers(users);
+      } catch (err) {
+        console.error("Error fetching competition or users:", err);
+        setError("Failed to fetch competition or users.");
+      }
     };
     fetchCompetition();
 
     const fetchTemplates = async () => {
-      const templates = await getCompetitionTemplates({
-        competitionCode: code,
-      });
-      console.log(templates);
-      setTemplates(templates);
-      const forms = await getTemplateForms({
-        templateId: templates.find(
-          (template) => template.title === "General Information Form"
-        )?._id,
-      });
-      console.log(forms);
-      setForms(forms);
+      try {
+        const templates = await getCompetitionTemplates({
+          competitionCode: code,
+        });
+        console.log(templates);
+        setTemplates(templates);
+        const forms = await getTemplateForms({
+          templateId: templates.find(
+            (template) => template.title === "General Information Form"
+          )?._id,
+        });
+        console.log(forms);
+        setForms(forms);
+      } catch (err) {
+        console.error("Error fetching templates or forms:", err);
+        setError("Failed to fetch templates or forms.");
+      }
     };
 
     fetchTemplates();
@@ -70,28 +87,43 @@ const CompetitionDash = ({ user }) => {
     fetchFiles();
 
     const fetchWordlists = async () => {
-      const wordlists = await getWordlists({ competitionCode: code });
-      console.log(wordlists);
-      setWordlists(wordlists);
+      try {
+        const wordlists = await getWordlists({ competitionCode: code });
+        console.log(wordlists);
+        setWordlists(wordlists);
+      } catch (err) {
+        console.error("Error fetching wordlists:", err);
+        setError("Failed to fetch wordlists.");
+      }
     };
 
     fetchWordlists();
   }, []);
 
   const handleFileUpload = (e) => {
-    const files = e.target.files;
+    if (!file) {
+      setError("Please select a file to upload.");
+      return;
+    }
+    const files = file.target.files;
     console.log(files);
     const handleFileUpload = async () => {
-      setLoading(true); // Set loading to true
-      const res = await uploadFile({
-        file: files[0],
-        competitionCode: code,
-        creatorId: user.uid,
-      });
-      console.log(res);
-      fetchFiles();
-      e.target.value = null;
-      setLoading(false); // Set loading to false
+      try {
+        setLoading(true); // Set loading to true
+        const res = await uploadFile({
+          file: files[0],
+          competitionCode: code,
+          creatorId: user.uid,
+        });
+        console.log(res);
+        fetchFiles();
+        file.target.value = null;
+      } catch (err) {
+        console.error("Error uploading file:", err);
+        setError("Failed to upload file.");
+      } finally {
+        setLoading(false); // Set loading to false
+      }
     };
     handleFileUpload();
   };
@@ -156,117 +188,136 @@ const CompetitionDash = ({ user }) => {
           </nav>
         </aside>
         <main className="flex-1 p-6">
-          {competition ? (
-            <>
-              <section className="mb-8">
-                <h3 className="text-2xl font-semibold mb-2">
-                  {competition.title} Dashboard
-                </h3>
-                <h2 className="text-xl font-semibold mb-4">
-                  Join Code:{" "}
-                  <span className="font-bold text-yellow-500">{code}</span>
-                </h2>
-
-                <p>{competition.description}</p>
-                <p>
-                  Start Date:{" "}
-                  {new Date(competition.startDate).toLocaleDateString()}
-                </p>
-                <p>
-                  End Date: {new Date(competition.endDate).toLocaleDateString()}
-                </p>
-                <div className="mt-4">
-                  <h4 className="text-xl font-semibold">Participants</h4>
-                  {competition.participants.length > 0 ? (
-                    competition.participants.map((participant) => (
-                      <p key={participant}>{participant}</p>
-                    ))
-                  ) : (
-                    <p>Nothing here!</p>
-                  )}
-                </div>
-              </section>
-              <section className="mb-8">
-                <h3 className="text-2xl font-semibold mb-2">Forms</h3>
-                {templates.length > 0 ? (
-                  templates.map((form) => (
-                    <div
-                      key={form._id}
-                      className="mb-4 p-4 bg-yellow-100 rounded"
-                    >
-                      <h4 className="text-xl font-semibold">{form.title}</h4>
-                      <p>{form.creatorId}</p>
-                      <p>{form.competitionCode}</p>
-                      {form.fields.map((field) => (
-                        <p key={field.name}>
-                          {field.name} - {field.type}
-                        </p>
-                      ))}
-                      <Link
-                        to={`/competition/${code}/form/${form._id}`}
-                        className="text-blue-500 hover:underline"
-                      >
-                        View Answers
-                      </Link>
-                    </div>
-                  ))
-                ) : (
-                  <p>Nothing here!</p>
-                )}
-              </section>
-              <section className="mb-8">
-                <h3 className="text-2xl font-semibold mb-2">Timeline</h3>
-                {competition.timeline.length > 0 ? (
-                  competition.timeline.map((item) => (
-                    <div
-                      key={item.name}
-                      className="mb-4 p-4 bg-yellow-100 rounded"
-                    >
-                      <h4 className="text-xl font-semibold">{item.name}</h4>
-                      <p>{item.description}</p>
-                      <p>
-                        {new Date(item.startDate).toLocaleDateString()}{" "}
-                        {item.startDate !== item.endDate && (
-                          <span>
-                            to {new Date(item.endDate).toLocaleDateString()}
-                          </span>
-                        )}
-                      </p>
-                    </div>
-                  ))
-                ) : (
-                  <p>Nothing here!</p>
-                )}
-              </section>
-              <section className="mb-8">
-                <h3 className="text-2xl font-semibold mb-2">Checklist</h3>
-                {competition.checklist.length > 0 ? (
-                  competition.checklist.map((item) => (
-                    <div
-                      key={item.name}
-                      className="mb-4 p-4 bg-yellow-100 rounded"
-                    >
-                      <h4 className="text-xl font-semibold">{item.name}</h4>
-                      <p>{item.description}</p>
-                    </div>
-                  ))
-                ) : (
-                  <p>Nothing here!</p>
-                )}
-              </section>
-            </>
-          ) : (
-            <p>Nothing here!</p>
+          {competition && error && (
+            <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
+              <div className="bg-white p-6 rounded shadow-lg">
+                <h2 className="text-2xl font-semibold mb-4">Error</h2>
+                <p>{error}</p>
+                <button
+                  onClick={() => setError(null)}
+                  className="mt-4 bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
           )}
+          <>
+            <section className="mb-8">
+              <h3 className="text-2xl font-semibold mb-2">
+                {competition.title} Dashboard
+              </h3>
+              <h2 className="text-xl font-semibold mb-4">
+                Join Code:{" "}
+                <span className="font-bold text-yellow-500">{code}</span>
+              </h2>
+
+              <p>{competition.description}</p>
+              <p>
+                Start Date:{" "}
+                {new Date(competition.startDate).toLocaleDateString()}
+              </p>
+              <p>
+                End Date: {new Date(competition.endDate).toLocaleDateString()}
+              </p>
+              <div className="mt-4">
+                <h4 className="text-xl font-semibold">Participants</h4>
+                {competition.participants.length > 0 ? (
+                  competition.participants.map((participant) => (
+                    <p key={participant}>{participant}</p>
+                  ))
+                ) : (
+                  <p>Nothing here!</p>
+                )}
+              </div>
+            </section>
+            <section className="mb-8">
+              <h3 className="text-2xl font-semibold mb-2">Forms</h3>
+              {templates.length > 0 ? (
+                templates.map((form) => (
+                  <div
+                    key={form._id}
+                    className="mb-4 p-4 bg-yellow-100 rounded"
+                  >
+                    <h4 className="text-xl font-semibold">{form.title}</h4>
+                    <p>{form.creatorId}</p>
+                    <p>{form.competitionCode}</p>
+                    {form.fields.map((field) => (
+                      <p key={field.name}>
+                        {field.name} - {field.type}
+                      </p>
+                    ))}
+                    <Link
+                      to={`/competition/${code}/form/${form._id}`}
+                      className="text-blue-500 hover:underline"
+                    >
+                      View Answers
+                    </Link>
+                  </div>
+                ))
+              ) : (
+                <p>Nothing here!</p>
+              )}
+            </section>
+            <section className="mb-8">
+              <h3 className="text-2xl font-semibold mb-2">Timeline</h3>
+              {competition.timeline.length > 0 ? (
+                competition.timeline.map((item) => (
+                  <div
+                    key={item.name}
+                    className="mb-4 p-4 bg-yellow-100 rounded"
+                  >
+                    <h4 className="text-xl font-semibold">{item.name}</h4>
+                    <p>{item.description}</p>
+                    <p>
+                      {new Date(item.startDate).toLocaleDateString()}{" "}
+                      {item.startDate !== item.endDate && (
+                        <span>
+                          to {new Date(item.endDate).toLocaleDateString()}
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                ))
+              ) : (
+                <p>Nothing here!</p>
+              )}
+            </section>
+            <section className="mb-8">
+              <h3 className="text-2xl font-semibold mb-2">Checklist</h3>
+              {competition.checklist.length > 0 ? (
+                competition.checklist.map((item) => (
+                  <div
+                    key={item.name}
+                    className="mb-4 p-4 bg-yellow-100 rounded"
+                  >
+                    <h4 className="text-xl font-semibold">{item.name}</h4>
+                    <p>{item.description}</p>
+                  </div>
+                ))
+              ) : (
+                <p>Nothing here!</p>
+              )}
+            </section>
+          </>
+
           <section className="mb-8">
             <h3 className="text-2xl font-semibold mb-2">Upload Files</h3>
             <input
               type="file"
-              onChange={(e) => handleFileUpload(e)}
+              accept="application/pdf" // Only allow PDF files
+              onChange={(e) => setFile(e)}
               className="block w-full text-gray-700 py-2 px-4 border border-gray-300 rounded"
               disabled={loading} // Disable input while loading
             />
             {loading && <p>Uploading...</p>} {/* Loading indicator */}
+            <br></br>
+            <button
+              className="bg-yellow-500 text-white py-2 px-4 rounded-lg hover:bg-yellow-600 transition duration-300"
+              onClick={handleFileUpload}
+            >
+              Upload File
+            </button>
           </section>
           <section className="mb-8">
             <h3 className="text-2xl font-semibold mb-2">Files</h3>
@@ -287,9 +338,14 @@ const CompetitionDash = ({ user }) => {
                   <button
                     onClick={() => {
                       const confirmDelete = async () => {
-                        const res = await deleteFile({ fileId: file.fileId });
-                        console.log(res);
-                        fetchFiles();
+                        try {
+                          const res = await deleteFile({ fileId: file.fileId });
+                          console.log(res);
+                          fetchFiles();
+                        } catch (err) {
+                          console.error("Error deleting file:", err);
+                          setError("Failed to delete file.");
+                        }
                       };
                       confirmDelete();
                     }}

@@ -10,11 +10,27 @@ const RegisterForm = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    setError(null); // Clear previous errors
     try {
       await createUserWithEmailAndPassword(auth, email, password);
       console.log("Account created");
     } catch (err) {
-      setError(err.message);
+      switch (err.code) {
+        case "auth/email-already-in-use":
+          setError("The email address is already in use by another account.");
+          break;
+        case "auth/invalid-email":
+          setError("The email address is not valid.");
+          break;
+        case "auth/operation-not-allowed":
+          setError("Email/password accounts are not enabled.");
+          break;
+        case "auth/weak-password":
+          setError("The password is too weak.");
+          break;
+        default:
+          setError("An unknown error occurred. Please try again.");
+      }
     }
   };
 

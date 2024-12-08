@@ -11,6 +11,7 @@ const AdminCreateWordlist = ({ user }) => {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const [words, setWords] = useState([]);
 
@@ -24,10 +25,22 @@ const AdminCreateWordlist = ({ user }) => {
 
   const handleUpload = async () => {
     if (file) {
-      console.log(file);
-      const words = await getWords(file);
-      console.log(words);
-      setWords(words);
+      try {
+        setError(null);
+        console.log(file);
+        const words = await getWords(file);
+        console.log(words);
+        setWords(words);
+      } catch (err) {
+        console.error("Error uploading file:", err);
+        if (err.response && err.response.data) {
+          setError(`Failed to upload file: ${err.response.data.message}`);
+        } else {
+          setError("Failed to upload file. Please try again.");
+        }
+      }
+    } else {
+      setError("Please select a file to upload.");
     }
   };
 
@@ -41,19 +54,29 @@ const AdminCreateWordlist = ({ user }) => {
     );
 
     setLoading(true);
+    setError(null);
 
-    const wordlist = await createWordlist({
-      title,
-      description,
-      competitionCode,
-      creatorId: user.uid,
-      words,
-    });
+    try {
+      const wordlist = await createWordlist({
+        title,
+        description,
+        competitionCode,
+        creatorId: user.uid,
+        words,
+      });
 
-    setLoading(false);
-    navigate(`/competition/${competitionCode}/wordlist/${wordlist._id}`);
-
-    console.log(wordlist);
+      navigate(`/competition/${competitionCode}/wordlist/${wordlist._id}`);
+      console.log(wordlist);
+    } catch (err) {
+      console.error("Error creating wordlist:", err);
+      if (err.response && err.response.data) {
+        setError(`Failed to create wordlist: ${err.response.data.message}`);
+      } else {
+        setError("Failed to create wordlist. Please try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -99,6 +122,10 @@ const AdminCreateWordlist = ({ user }) => {
           Create Wordlist
         </button>
       </div>
+
+      {error && (
+        <div className="p-4 mb-4 bg-red-200 text-red-800 rounded">{error}</div>
+      )}
 
       {words.length > 0 && (
         <div className="mt-4">

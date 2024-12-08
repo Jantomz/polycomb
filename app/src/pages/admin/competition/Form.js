@@ -7,10 +7,9 @@ const Form = ({ user }) => {
   const { getTemplate, getTemplateForms } = useApi();
 
   const [template, setTemplate] = useState(null);
-
   const [forms, setForms] = useState([]);
-
   const [searchTerm, setSearchTerm] = useState("");
+  const [error, setError] = useState(null);
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
@@ -46,25 +45,37 @@ const Form = ({ user }) => {
 
   useEffect(() => {
     const fetchTemplate = async () => {
-      const template = await getTemplate({ templateId });
-      console.log(template);
-      setTemplate(template);
+      try {
+        const template = await getTemplate({ templateId });
+        console.log(template);
+        setTemplate(template);
+      } catch (error) {
+        console.error("Failed to fetch template:", error);
+        setError("Failed to fetch template.");
+      }
     };
-    fetchTemplate();
 
     const fetchForms = async () => {
-      const forms = await getTemplateForms({ templateId });
-      console.log(forms);
-      setForms(forms);
+      try {
+        const forms = await getTemplateForms({ templateId });
+        console.log(forms);
+        setForms(forms);
+      } catch (error) {
+        console.error("Failed to fetch forms:", error);
+        setError("Failed to fetch forms.");
+      }
     };
+
+    fetchTemplate();
     fetchForms();
-  }, []);
+  }, [templateId]);
 
   return (
     <div className="p-6 bg-yellow-50 min-h-screen">
       <h1 className="text-3xl font-bold text-yellow-700 mb-4">
         Form {templateId}
       </h1>
+      {error && <div className="text-red-500 mb-4">{error}</div>}
       {template && (
         <div className="mb-8">
           <h1 className="text-2xl font-semibold text-yellow-600 mb-2">

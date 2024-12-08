@@ -12,18 +12,24 @@ const AdminEditWordlist = ({ user, userData }) => {
   const [isRecording, setIsRecording] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
   const pageSize = 20;
   const mediaRecorderRef = useRef(null);
 
   useEffect(() => {
     const performInitialRender = async () => {
-      const resWordlist = await getWordlist({
-        competitionCode: code,
-        wordlistId,
-      });
-      setWordlist(resWordlist);
-      setTotalPages(Math.ceil(resWordlist.words.length / pageSize));
+      try {
+        const resWordlist = await getWordlist({
+          competitionCode: code,
+          wordlistId,
+        });
+        setWordlist(resWordlist);
+        setTotalPages(Math.ceil(resWordlist.words.length / pageSize));
+      } catch (err) {
+        setError("Failed to fetch wordlist.");
+        console.error(err);
+      }
     };
     performInitialRender();
   }, [userData]);
@@ -37,64 +43,83 @@ const AdminEditWordlist = ({ user, userData }) => {
     const start = (page - 1) * pageSize;
     const end = start + pageSize;
     const wordIds = wordlist.words.slice(start, end);
-    const words = await Promise.all(
-      wordIds.map((id) => getWord({ wordId: id }))
-    );
-    setWords(words);
-    setCurrentPage(page);
-    console.log(words);
+    try {
+      const words = await Promise.all(
+        wordIds.map((id) => getWord({ wordId: id }))
+      );
+      setWords(words);
+      setCurrentPage(page);
+    } catch (err) {
+      setError("Failed to fetch words.");
+      console.error(err);
+    }
   };
 
   const postAudio = async ({ wordId, audio }) => {
-    const word = await getWord({ wordId });
-    const newWord = await uploadAudio({
-      audio,
-      wordId,
-      creatorId: user.uid,
-      oldAudioId: word.audioId,
-    });
-    setWords((prevWords) =>
-      prevWords.map((prevWord) =>
-        prevWord._id === wordId ? newWord : prevWord
-      )
-    );
-
-    console.log(newWord);
-
-    fetchWords(currentPage);
+    try {
+      const word = await getWord({ wordId });
+      const newWord = await uploadAudio({
+        audio,
+        wordId,
+        creatorId: user.uid,
+        oldAudioId: word.audioId,
+      });
+      setWords((prevWords) =>
+        prevWords.map((prevWord) =>
+          prevWord._id === wordId ? newWord : prevWord
+        )
+      );
+      fetchWords(currentPage);
+    } catch (err) {
+      setError("Failed to upload audio.");
+      console.error(err);
+    }
   };
 
   const startRecording = async ({ wordId }) => {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    mediaRecorderRef.current = new MediaRecorder(stream);
-    mediaRecorderRef.current.ondataavailable = (event) => {
-      const audioBlob = event.data;
-      const audioFile = new File([audioBlob], "recording.wav", {
-        type: "audio/wav",
-      });
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorderRef.current = new MediaRecorder(stream);
+      mediaRecorderRef.current.ondataavailable = (event) => {
+        const audioBlob = event.data;
+        const audioFile = new File([audioBlob], "recording.wav", {
+          type: "audio/wav",
+        });
 
-      const setAudio = async () => {
-        await postAudio({ wordId, audio: audioFile });
+        const setAudio = async () => {
+          await postAudio({ wordId, audio: audioFile });
+        };
+        setAudio();
       };
-      setAudio();
-    };
-    mediaRecorderRef.current.start();
-    setIsRecording(wordId);
+      mediaRecorderRef.current.start();
+      setIsRecording(wordId);
+    } catch (err) {
+      setError("Failed to start recording.");
+      console.error(err);
+    }
   };
 
   const stopRecording = () => {
-    mediaRecorderRef.current.stop();
-    setIsRecording("");
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+      setIsRecording("");
+    }
   };
 
   return (
     <div className="p-6 bg-yellow-50 min-h-screen">
       <h1 className="text-4xl font-bold text-yellow-700 mb-4">Edit Wordlist</h1>
+      {error && <p className="text-red-500 mb-4">{error}</p>}
       <button
         onClick={() => {
           const removeWordlist = async () => {
-            await deleteWordlist({ wordlistId });
-            navigate(`/competition/${code}`);
+            try {
+              await deleteWordlist({ wordlistId });
+              navigate(`/competition/${code}`);
+            } catch (err) {
+              setError("Failed to delete wordlist.");
+              console.error(err);
+            }
           };
           removeWordlist();
         }}
@@ -150,11 +175,16 @@ const AdminEditWordlist = ({ user, userData }) => {
                   <button
                     onClick={() => {
                       const removeWord = async () => {
-                        await deleteWord({
-                          wordId: word._id,
-                          audioId: word.audioId || null,
-                        });
-                        await fetchWords(currentPage);
+                        try {
+                          await deleteWord({
+                            wordId: word._id,
+                            audioId: word.audioId || null,
+                          });
+                          await fetchWords(currentPage);
+                        } catch (err) {
+                          setError("Failed to delete word.");
+                          console.error(err);
+                        }
                       };
                       removeWord();
                     }}

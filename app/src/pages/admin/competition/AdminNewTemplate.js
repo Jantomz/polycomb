@@ -11,6 +11,7 @@ const AdminNewTemplate = ({ user }) => {
     creatorId: user.uid,
     fields: [{ name: "", type: "text", required: false }],
   });
+  const [error, setError] = useState(null);
 
   const navigate = useNavigate();
 
@@ -40,21 +41,25 @@ const AdminNewTemplate = ({ user }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await createTemplate(formData);
+    setError(null);
+    try {
+      const res = await createTemplate(formData);
 
-    console.log(res);
-
-    if (res) {
-      alert("Template created successfully");
-      navigate(`/competition/${competitionCode}`);
-      setFormData({
-        title: "",
-        competitionCode: competitionCode,
-        creatorId: user.uid,
-        fields: [{ name: "", type: "text", required: false }],
-      });
-    } else {
-      alert("Error creating template");
+      if (res) {
+        alert("Template created successfully");
+        navigate(`/competition/${competitionCode}`);
+        setFormData({
+          title: "",
+          competitionCode: competitionCode,
+          creatorId: user.uid,
+          fields: [{ name: "", type: "text", required: false }],
+        });
+      } else {
+        throw new Error("Unknown error occurred");
+      }
+    } catch (err) {
+      console.error(err);
+      setError(err.message || "An error occurred while creating the template");
     }
   };
 
@@ -69,6 +74,7 @@ const AdminNewTemplate = ({ user }) => {
   return (
     <div className="p-6 bg-yellow-50 min-h-screen">
       <h1 className="text-3xl font-bold text-yellow-700 mb-6">New Template</h1>
+      {error && <div className="text-red-500 mb-4">{error}</div>}
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           autoComplete="off"

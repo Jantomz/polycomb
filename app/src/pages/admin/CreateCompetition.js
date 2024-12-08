@@ -11,6 +11,12 @@ const CreateCompetition = ({ user, setUserData }) => {
 
   useEffect(() => {
     let newErrors = {};
+    if (!startDate) {
+      newErrors.startDate = "Start date is required.";
+    }
+    if (!endDate) {
+      newErrors.endDate = "End date is required.";
+    }
     if (new Date(startDate) > new Date(endDate)) {
       newErrors.endDate = "Start date cannot be after end date.";
     }
@@ -23,56 +29,74 @@ const CreateCompetition = ({ user, setUserData }) => {
     const description = e.target.description.value;
     const startTemplate = e.target.startTemplate.checked;
 
-    if (Object.keys(errors).length > 0) {
+    let newErrors = {};
+    if (!title) {
+      newErrors.title = "Title is required.";
+    }
+    if (!description) {
+      newErrors.description = "Description is required.";
+    }
+    if (!startDate) {
+      newErrors.startDate = "Start date is required.";
+    }
+    if (!endDate) {
+      newErrors.endDate = "End date is required.";
+    }
+    if (new Date(startDate) > new Date(endDate)) {
+      newErrors.endDate = "Start date cannot be after end date.";
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       return;
     }
 
     const code = Math.floor(10000 + Math.random() * 90000).toString();
     const admins = [user.uid];
 
-    console.log(title, description, startDate, endDate, code, admins);
+    try {
+      const res = await createCompetition(
+        title,
+        description,
+        code,
+        startDate,
+        endDate,
+        admins
+      );
 
-    const res = await createCompetition(
-      title,
-      description,
-      code,
-      startDate,
-      endDate,
-      admins
-    );
+      if (startTemplate) {
+        const templateRes = await createTemplate({
+          title: "General Information Form",
+          competitionCode: res.code,
+          creatorId: user.uid,
+          fields: [
+            { name: "Name", type: "text", required: true },
+            { name: "Email", type: "email", required: true },
+            { name: "Birthdate", type: "date", required: true },
+            { name: "School", type: "text", required: true },
+            { name: "Grade", type: "number", required: true },
+          ],
+        });
 
-    console.log(res);
+        console.log("Template created: ", templateRes);
+      }
 
-    if (startTemplate) {
-      const templateRes = await createTemplate({
-        title: "General Information Form",
-        competitionCode: res.code,
-        creatorId: user.uid,
-        fields: [
-          { name: "Name", type: "text", required: true },
-          { name: "Email", type: "email", required: true },
-          { name: "Birthdate", type: "date", required: true },
-          { name: "School", type: "text", required: true },
-          { name: "Grade", type: "number", required: true },
-        ],
+      if (res) {
+        const res2 = await addCompetition({
+          code: res.code,
+          userId: user.uid,
+        });
+
+        setUserData(res2);
+      }
+
+      navigate("/");
+    } catch (error) {
+      console.error("Error creating competition: ", error);
+      setErrors({
+        api: "An error occurred while creating the competition. Please try again later.",
       });
-
-      console.log("Template created: ", templateRes);
     }
-
-    if (res) {
-      console.log("User Id: ", user.uid);
-      console.log("Competition Code: ", res.code);
-      const res2 = await addCompetition({
-        code: res.code,
-        userId: user.uid,
-      });
-
-      console.log(res2);
-      setUserData(res2);
-    }
-
-    navigate("/");
   };
 
   return (
@@ -100,6 +124,9 @@ const CreateCompetition = ({ user, setUserData }) => {
             required
             className="w-full p-2 border border-yellow-300 rounded"
           />
+          {errors.title && (
+            <p className="text-red-500 text-sm mt-1">{errors.title}</p>
+          )}
         </div>
 
         <div className="mb-4">
@@ -117,6 +144,9 @@ const CreateCompetition = ({ user, setUserData }) => {
             required
             className="w-full p-2 border border-yellow-300 rounded"
           />
+          {errors.description && (
+            <p className="text-red-500 text-sm mt-1">{errors.description}</p>
+          )}
         </div>
 
         <div className="mb-4">
@@ -136,6 +166,9 @@ const CreateCompetition = ({ user, setUserData }) => {
             required
             className="w-full p-2 border border-yellow-300 rounded"
           />
+          {errors.startDate && (
+            <p className="text-red-500 text-sm mt-1">{errors.startDate}</p>
+          )}
         </div>
 
         <div className="mb-4">
@@ -174,6 +207,10 @@ const CreateCompetition = ({ user, setUserData }) => {
             Start with Default Information Form?
           </label>
         </div>
+
+        {errors.api && (
+          <p className="text-red-500 text-sm mb-4">{errors.api}</p>
+        )}
 
         <button
           type="submit"

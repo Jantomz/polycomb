@@ -8,16 +8,22 @@ const AdminEditSchedule = () => {
   const { updateSchedule, getCompetition } = useApi();
   const { code } = useParams();
   const [competition, setCompetition] = useState(null);
+  const [error, setError] = useState(null);
 
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCompetition = async () => {
-      const competition = await getCompetition({ code });
-      console.log(competition);
-      setCompetition(competition);
-      if (competition?.schedule) {
-        setEvents(competition.schedule);
+      try {
+        const competition = await getCompetition({ code });
+        console.log(competition);
+        setCompetition(competition);
+        if (competition?.schedule) {
+          setEvents(competition.schedule);
+        }
+      } catch (err) {
+        console.error("Failed to fetch competition:", err);
+        setError("Failed to fetch competition. Please try again later.");
       }
     };
     fetchCompetition();
@@ -82,8 +88,13 @@ const AdminEditSchedule = () => {
     console.log(events);
 
     const submitSchedule = async () => {
-      await updateSchedule({ code, schedule: events });
-      navigate(`/competition/${code}`);
+      try {
+        await updateSchedule({ code, schedule: events });
+        navigate(`/competition/${code}`);
+      } catch (err) {
+        console.error("Failed to update schedule:", err);
+        setError("Failed to update schedule. Please try again later.");
+      }
     };
 
     submitSchedule();
@@ -94,6 +105,9 @@ const AdminEditSchedule = () => {
       <h1 className="text-3xl font-bold text-yellow-700 mb-6">
         Edit Schedule for {competition?.title}
       </h1>
+      {error && (
+        <div className="bg-red-100 text-red-700 p-4 rounded mb-6">{error}</div>
+      )}
       <form onSubmit={(e) => handleSubmit(e)} className="space-y-6">
         {events.map((event, index) => (
           <div

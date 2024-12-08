@@ -10,7 +10,17 @@ const GoogleLogin = () => {
       const user = result.user;
       console.log("Google Login successful", user);
     } catch (error) {
-      console.error("Error with Google login", error);
+      if (error.code === "auth/popup-closed-by-user") {
+        console.error(
+          "The popup was closed by the user before completing the sign in."
+        );
+      } else if (error.code === "auth/cancelled-popup-request") {
+        console.error("Only one popup request is allowed at one time.");
+      } else if (error.code === "auth/network-request-failed") {
+        console.error("Network error occurred during the sign in.");
+      } else {
+        console.error("Error with Google login", error);
+      }
     }
   };
 

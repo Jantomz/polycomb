@@ -7,16 +7,22 @@ const AdminEditTimeline = () => {
   const { updateTimeline, getCompetition } = useApi();
   const { code } = useParams();
   const [competition, setCompetition] = useState(null);
+  const [error, setError] = useState(null);
 
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCompetition = async () => {
-      const competition = await getCompetition({ code });
-      console.log(competition);
-      setCompetition(competition);
-      if (competition?.timeline) {
-        setEvents(competition.timeline);
+      try {
+        const competition = await getCompetition({ code });
+        console.log(competition);
+        setCompetition(competition);
+        if (competition?.timeline) {
+          setEvents(competition.timeline);
+        }
+      } catch (err) {
+        console.error("Failed to fetch competition:", err);
+        setError("Failed to fetch competition. Please try again later.");
       }
     };
     fetchCompetition();
@@ -49,8 +55,13 @@ const AdminEditTimeline = () => {
     e.preventDefault();
     console.log(events);
     const submitTimeline = async () => {
-      await updateTimeline({ code, timeline: events });
-      navigate(`/competition/${code}`);
+      try {
+        await updateTimeline({ code, timeline: events });
+        navigate(`/competition/${code}`);
+      } catch (err) {
+        console.error("Failed to update timeline:", err);
+        setError("Failed to update timeline. Please try again later.");
+      }
     };
     submitTimeline();
   };
@@ -60,6 +71,7 @@ const AdminEditTimeline = () => {
       <h1 className="text-2xl font-bold mb-4">
         Edit Timeline for {competition?.title}
       </h1>
+      {error && <p className="text-red-500">{error}</p>}
       <form onSubmit={(e) => handleSubmit(e)} className="space-y-6">
         {events.map((event, index) => (
           <div

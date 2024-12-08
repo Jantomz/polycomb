@@ -10,25 +10,36 @@ const AdminEditChecklist = () => {
   const [conditions, setConditions] = useState([]);
   const [templates, setTemplates] = useState([]);
   const navigate = useNavigate();
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchCompetition = async () => {
-      const competition = await getCompetition({ code });
-      console.log(competition);
-      setCompetition(competition);
-      if (competition?.checklist) {
-        setTasks(competition.checklist);
+      try {
+        const competition = await getCompetition({ code });
+        console.log(competition);
+        setCompetition(competition);
+        if (competition?.checklist) {
+          setTasks(competition.checklist);
+        }
+      } catch (err) {
+        console.error("Failed to fetch competition:", err);
+        setError("Failed to fetch competition. Please try again later.");
       }
     };
     fetchCompetition();
 
     const fetchForms = async () => {
-      const forms = await getCompetitionTemplates({ competitionCode: code });
-      console.log("Condition to complete: ", forms);
-      setTemplates(forms);
-      setConditions(
-        forms.map((form) => `COMPLETE ${form.title} (${form._id})`)
-      );
+      try {
+        const forms = await getCompetitionTemplates({ competitionCode: code });
+        console.log("Condition to complete: ", forms);
+        setTemplates(forms);
+        setConditions(
+          forms.map((form) => `COMPLETE ${form.title} (${form._id})`)
+        );
+      } catch (err) {
+        console.error("Failed to fetch forms:", err);
+        setError("Failed to fetch forms. Please try again later.");
+      }
     };
 
     fetchForms();
@@ -62,8 +73,13 @@ const AdminEditChecklist = () => {
     console.log(tasks);
 
     const submitChecklist = async () => {
-      await updateChecklist({ code, checklist: tasks });
-      navigate(`/competition/${code}`);
+      try {
+        await updateChecklist({ code, checklist: tasks });
+        navigate(`/competition/${code}`);
+      } catch (err) {
+        console.error("Failed to update checklist:", err);
+        setError("Failed to update checklist. Please try again later.");
+      }
     };
 
     submitChecklist();
@@ -74,6 +90,9 @@ const AdminEditChecklist = () => {
       <h1 className="text-3xl font-bold text-yellow-700 mb-6">
         Edit Checklist for {competition?.title}
       </h1>
+      {error && (
+        <div className="bg-red-100 text-red-700 p-4 rounded mb-6">{error}</div>
+      )}
       <form onSubmit={(e) => handleSubmit(e)} className="space-y-6">
         {tasks.map((task, index) => (
           <div

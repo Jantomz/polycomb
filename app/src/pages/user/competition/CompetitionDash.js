@@ -19,41 +19,51 @@ const CompetitionDash = ({ user }) => {
   const [files, setFiles] = useState([]);
   const [posts, setPosts] = useState([]);
   const [wordlists, setWordlists] = useState([]);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchCompetition = async () => {
-      const competition = await getCompetition({ code: code });
-      setCompetition(competition);
+      try {
+        const competition = await getCompetition({ code: code });
+        setCompetition(competition);
+      } catch (err) {
+        setError("Failed to fetch competition data.");
+      }
     };
     fetchCompetition();
 
     const fetchTemplates = async () => {
-      const templates = await getCompetitionTemplates({
-        competitionCode: code,
-      });
-      setTemplates(templates);
+      try {
+        const templates = await getCompetitionTemplates({
+          competitionCode: code,
+        });
+        setTemplates(templates);
+      } catch (err) {
+        setError("Failed to fetch competition templates.");
+      }
     };
-
     fetchTemplates();
 
     const fetchForms = async () => {
-      const forms = await getUserForms({
-        competitionCode: code,
-        userId: user.uid,
-      });
-      setForms(forms);
+      try {
+        const forms = await getUserForms({
+          competitionCode: code,
+          userId: user.uid,
+        });
+        setForms(forms);
+      } catch (err) {
+        setError("Failed to fetch user forms.");
+      }
     };
     fetchForms();
 
-    const fetchPosts = async () => {
-      const posts = await getPosts({ competitionCode: code });
-      setPosts(posts);
-    };
-    fetchPosts();
-
     const fetchWordlists = async () => {
-      const wordlists = await getWordlists({ competitionCode: code });
-      setWordlists(wordlists);
+      try {
+        const wordlists = await getWordlists({ competitionCode: code });
+        setWordlists(wordlists);
+      } catch (err) {
+        setError("Failed to fetch wordlists.");
+      }
     };
     fetchWordlists();
   }, []);
@@ -92,6 +102,11 @@ const CompetitionDash = ({ user }) => {
           </nav>
         </aside>
         <main className="flex-1 p-6">
+          {error && (
+            <div className="fixed top-0 left-0 right-0 bg-red-500 text-white p-4 text-center">
+              {error}
+            </div>
+          )}
           {competition ? (
             <>
               <section className="mb-8">

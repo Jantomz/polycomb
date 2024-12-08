@@ -7,27 +7,44 @@ const WordlistDifficulty = () => {
   const { generateWordFrequency } = useApi();
 
   const [words, setWords] = useState([]);
-
   const [file, setFile] = useState(null);
+  const [error, setError] = useState(null);
+
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
   };
 
   const handleUpload = async () => {
     if (file) {
-      console.log(file);
-      const words = await getWords(file);
-      console.log(words);
-      setWords(words);
-      const frequencies = await Promise.all(
-        words.map(async (word) => {
-          const frequency = await generateWordFrequency({ word: word.word });
-          const freq = frequency.frequency;
-          return { ...word, freq };
-        })
-      );
-
-      setWords(frequencies);
+      try {
+        console.log(file);
+        const words = await getWords(file);
+        console.log(words);
+        setWords(words);
+        const frequencies = await Promise.all(
+          words.map(async (word) => {
+            try {
+              const frequency = await generateWordFrequency({
+                word: word.word,
+              });
+              const freq = frequency.frequency;
+              return { ...word, freq };
+            } catch (err) {
+              console.error(
+                `Error generating frequency for word ${word.word}:`,
+                err
+              );
+              return { ...word, freq: "Error" };
+            }
+          })
+        );
+        setWords(frequencies);
+      } catch (err) {
+        console.error("Error uploading file:", err);
+        setError("Failed to upload and process the file. Please try again.");
+      }
+    } else {
+      setError("Please select a file to upload.");
     }
   };
 
@@ -51,20 +68,23 @@ const WordlistDifficulty = () => {
             Upload CSV
           </button>
         </div>
+        {error && <p className="text-red-500">{error}</p>}
         {words.length > 0 && (
           <div className="w-1/2 h-80 overflow-y-auto mx-auto">
-            <h3>Preview</h3>
+            <h3 className="text-xl font-semibold mb-2">Preview</h3>
             {words.map((word, index) => (
-              <div key={index} className="mb-4 p-4 border rounded-lg">
+              <div key={index} className="mb-4 p-4 border rounded-lg shadow-sm">
                 <h3 className="text-lg font-bold">{word.word}</h3>
-                <p>Pronunciation: {word.pronunciation}</p>
-                <p>Part of speech: {word.partOfSpeech}</p>
-                <p>Definition: {word.definition}</p>
-                <p>Etymology: {word.etymology}</p>
-                <p>Sentence: {word.sentence}</p>
-                <p>Notes: {word.notes}</p>
+                <p className="text-sm">Pronunciation: {word.pronunciation}</p>
+                <p className="text-sm">Part of speech: {word.partOfSpeech}</p>
+                <p className="text-sm">Definition: {word.definition}</p>
+                <p className="text-sm">Etymology: {word.etymology}</p>
+                <p className="text-sm">Sentence: {word.sentence}</p>
+                <p className="text-sm">Notes: {word.notes}</p>
                 {word.freq && (
-                  <p className="font-bold">Generated Frequency: {word.freq}</p>
+                  <p className="text-sm font-bold">
+                    Generated Frequency: {word.freq}
+                  </p>
                 )}
               </div>
             ))}
@@ -74,43 +94,48 @@ const WordlistDifficulty = () => {
           <button
             className="bg-yellow-500 text-white py-2 px-4 rounded-lg hover:bg-yellow-600 transition duration-300"
             onClick={() => {
-              const csvHeader = [
-                "Word",
-                "Pronunciation",
-                "Part of Speech",
-                "Definition",
-                "Etymology",
-                "Sentence",
-                "Notes",
-                "Frequency",
-              ].join(",");
+              try {
+                const csvHeader = [
+                  "Word",
+                  "Pronunciation",
+                  "Part of Speech",
+                  "Definition",
+                  "Etymology",
+                  "Sentence",
+                  "Notes",
+                  "Frequency",
+                ].join(",");
 
-              const csvContent =
-                "data:text/csv;charset=utf-8," +
-                csvHeader +
-                "\n" +
-                words
-                  .map((word) =>
-                    [
-                      `"${word.word}"`,
-                      `"${word.pronunciation}"`,
-                      `"${word.partOfSpeech}"`,
-                      `"${word.definition}"`,
-                      `"${word.etymology}"`,
-                      `"${word.sentence}"`,
-                      `"${word.notes}"`,
-                      `"${word.freq}"`,
-                    ].join(",")
-                  )
-                  .join("\n");
+                const csvContent =
+                  "data:text/csv;charset=utf-8," +
+                  csvHeader +
+                  "\n" +
+                  words
+                    .map((word) =>
+                      [
+                        `"${word.word}"`,
+                        `"${word.pronunciation}"`,
+                        `"${word.partOfSpeech}"`,
+                        `"${word.definition}"`,
+                        `"${word.etymology}"`,
+                        `"${word.sentence}"`,
+                        `"${word.notes}"`,
+                        `"${word.freq}"`,
+                      ].join(",")
+                    )
+                    .join("\n");
 
-              const encodedUri = encodeURI(csvContent);
-              const link = document.createElement("a");
-              link.setAttribute("href", encodedUri);
-              link.setAttribute("download", "wordlist.csv");
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", "wordlist.csv");
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+              } catch (err) {
+                console.error("Error downloading CSV:", err);
+                setError("Failed to download the CSV file. Please try again.");
+              }
             }}
           >
             Download as CSV

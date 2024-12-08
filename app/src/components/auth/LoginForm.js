@@ -10,11 +10,27 @@ const LoginForm = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setError(null); // Clear previous errors
     try {
       await signInWithEmailAndPassword(auth, email, password);
       console.log("Logged in successfully");
     } catch (err) {
-      setError(err.message);
+      switch (err.code) {
+        case "auth/invalid-email":
+          setError("Invalid email address.");
+          break;
+        case "auth/user-disabled":
+          setError("User account is disabled.");
+          break;
+        case "auth/user-not-found":
+          setError("No user found with this email.");
+          break;
+        case "auth/wrong-password":
+          setError("Incorrect password.");
+          break;
+        default:
+          setError("An unexpected error occurred. Please try again.");
+      }
     }
   };
 

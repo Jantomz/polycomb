@@ -5,21 +5,31 @@ import useApi from "../hooks/useApi.js";
 const ViewCompetitionFiles = () => {
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const { code } = useParams();
   const { getFiles } = useApi();
 
   useEffect(() => {
     const fetchFiles = async () => {
-      const files = await getFiles({ competitionCode: code });
-      setFiles(files);
-      setLoading(false);
+      try {
+        const files = await getFiles({ competitionCode: code });
+        setFiles(files);
+      } catch (err) {
+        setError("Failed to fetch files. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
     };
     fetchFiles();
   }, []);
 
   if (loading) {
     return <p>Loading...</p>;
+  }
+
+  if (error) {
+    return <p>{error}</p>;
   }
 
   return (

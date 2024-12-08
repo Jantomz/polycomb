@@ -9,38 +9,47 @@ const Form = ({ user }) => {
   const navigate = useNavigate();
 
   const [template, setTemplate] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchTemplate = async () => {
-      const template = await getTemplate({ templateId });
-      console.log(template);
-      setTemplate(template);
+      try {
+        const template = await getTemplate({ templateId });
+        setTemplate(template);
+      } catch (err) {
+        console.error("Failed to fetch template:", err);
+        setError("Failed to load the template. Please try again later.");
+      }
     };
     fetchTemplate();
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const data = Object.fromEntries(
       Array.from(formData.entries()).filter(([key]) => key !== "signature")
     );
-    console.log(data);
-    const form = submitForm({
-      templateId,
-      answers: data,
-      signature: e.target.signature.value,
-      uid: user.uid,
-    });
 
-    console.log(form);
-    navigate(`/competition/${template.competitionCode}`);
+    try {
+      const form = await submitForm({
+        templateId,
+        answers: data,
+        signature: e.target.signature.value,
+        uid: user.uid,
+      });
+      navigate(`/competition/${template.competitionCode}`);
+    } catch (err) {
+      console.error("Failed to submit form:", err);
+      setError("Failed to submit the form. Please try again later.");
+    }
   };
 
   return (
     <div className="min-h-screen bg-yellow-50 flex items-center justify-center">
       <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-2xl">
         <h1 className="text-3xl font-bold text-yellow-600 mb-4">Form</h1>
+        {error && <div className="text-red-500 mb-4">{error}</div>}
         {template && (
           <div>
             <h3 className="text-xl font-semibold text-yellow-700 mb-2">

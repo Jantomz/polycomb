@@ -5,42 +5,53 @@ import React from "react";
 
 const ViewWordlist = ({ user, userData }) => {
   const { getWordlist, getWord } = useApi();
-  const code = useParams().code;
-  const wordlistId = useParams().wordlistId;
+  const { code, wordlistId } = useParams();
   const [wordlist, setWordlist] = useState([]);
   const [words, setWords] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
   const pageSize = 20;
 
   useEffect(() => {
     const performInitialRender = async () => {
-      const resWordlist = await getWordlist({
-        competitionCode: code,
-        wordlistId,
-      });
-      setWordlist(resWordlist);
-      setTotalPages(Math.ceil(resWordlist.words.length / pageSize));
+      try {
+        const resWordlist = await getWordlist({
+          competitionCode: code,
+          wordlistId,
+        });
+        setWordlist(resWordlist);
+        setTotalPages(Math.ceil(resWordlist.words.length / pageSize));
+      } catch (err) {
+        setError("Failed to fetch wordlist. Please try again later.");
+        console.error(err);
+      }
     };
     performInitialRender();
   }, [userData]);
 
   useEffect(() => {
-    fetchWords(1);
+    if (wordlist.words) {
+      fetchWords(1);
+    }
   }, [wordlist]);
 
   const fetchWords = async (page) => {
     if (!wordlist.words) return;
     const start = (page - 1) * pageSize;
     const end = start + pageSize;
-    console.log("WORDLIST", wordlist);
     const wordIds = wordlist.words.slice(start, end);
-    const words = await Promise.all(
-      wordIds.map((id) => getWord({ wordId: id }))
-    );
-    setWords(words);
-    setCurrentPage(page);
+    try {
+      const words = await Promise.all(
+        wordIds.map((id) => getWord({ wordId: id }))
+      );
+      setWords(words);
+      setCurrentPage(page);
+    } catch (err) {
+      setError("Failed to fetch words. Please try again later.");
+      console.error(err);
+    }
   };
 
   return (
@@ -52,6 +63,7 @@ const ViewWordlist = ({ user, userData }) => {
       >
         Practice
       </Link>
+      {error && <div className="text-red-600 mb-4">{error}</div>}
       {wordlist && (
         <>
           <h2 className="text-2xl font-semibold text-yellow-800 mb-2">

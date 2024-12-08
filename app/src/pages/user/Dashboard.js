@@ -6,6 +6,7 @@ import useApi from "../../hooks/useApi.js";
 
 const Dashboard = ({ user, userData, setUserData }) => {
   const [showJoinPopup, setShowJoinPopup] = useState(false);
+  const [error, setError] = useState(null);
 
   const { getUserCompetitions } = useApi();
   const navigate = useNavigate();
@@ -13,9 +14,14 @@ const Dashboard = ({ user, userData, setUserData }) => {
   const [competitions, setCompetitions] = useState([]);
   useEffect(() => {
     const performInitialRender = async () => {
-      const competitions = await getUserCompetitions({ userId: user.uid });
-      setCompetitions(competitions);
-      console.log(competitions);
+      try {
+        const competitions = await getUserCompetitions({ userId: user.uid });
+        setCompetitions(competitions);
+        console.log(competitions);
+      } catch (err) {
+        console.error("Failed to fetch competitions:", err);
+        setError("Failed to fetch competitions. Please try again later.");
+      }
     };
     performInitialRender();
   }, [userData]);
@@ -59,6 +65,7 @@ const Dashboard = ({ user, userData, setUserData }) => {
         <h2 className="text-3xl font-semibold mb-8 text-gray-800">
           Your Competitions
         </h2>
+        {error && <div className="text-red-500 text-center mb-8">{error}</div>}
         <div className="flex flex-wrap gap-4 justify-center">
           {competitions.map((competition) => (
             <button

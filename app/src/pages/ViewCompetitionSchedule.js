@@ -6,15 +6,32 @@ const ViewCompetitionSchedule = () => {
   const { getCompetition } = useApi();
   const code = useParams().code;
   const [competition, setCompetition] = useState({});
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchCompetition = async () => {
-      const competition = await getCompetition({ code: code });
-      console.log(competition);
-      setCompetition(competition);
+      try {
+        const competition = await getCompetition({ code: code });
+        setCompetition(competition);
+      } catch (err) {
+        console.error("Failed to fetch competition:", err);
+        setError("Failed to fetch competition. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
     };
     fetchCompetition();
   }, []);
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
+  if (error) {
+    return <p>{error}</p>;
+  }
+
   return (
     <section className="mb-8">
       <h3 className="text-2xl font-semibold mb-2">

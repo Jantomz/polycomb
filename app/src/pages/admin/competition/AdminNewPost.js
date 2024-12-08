@@ -75,28 +75,31 @@ const AdminNewPost = ({ user }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const tags = formData.tags.split(",");
-    const res = await createPost({
-      ...formData,
-      tags,
-    });
-
-    console.log(res);
-
-    if (res) {
-      alert("Post created successfully");
-      setFormData({
-        title: "",
-        competitionCode: competitionCode,
-        description: "",
-        tags: "",
-        creatorId: user.uid,
-        content: [""],
-        images: [""],
+    try {
+      const tags = formData.tags.split(",");
+      const res = await createPost({
+        ...formData,
+        tags,
       });
-      navigate(`/competition/${competitionCode}`);
-    } else {
-      alert("Error creating post");
+
+      if (res) {
+        alert("Post created successfully");
+        setFormData({
+          title: "",
+          competitionCode: competitionCode,
+          description: "",
+          tags: "",
+          creatorId: user.uid,
+          content: [""],
+          images: [""],
+        });
+        navigate(`/competition/${competitionCode}`);
+      } else {
+        alert("Error creating post");
+      }
+    } catch (error) {
+      console.error("Error creating post:", error);
+      alert("An error occurred while creating the post. Please try again.");
     }
   };
 

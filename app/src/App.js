@@ -46,6 +46,7 @@ function App() {
 
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -58,9 +59,13 @@ function App() {
             const createdUserData = await createUser(user);
             setUserData(createdUserData);
           }
-          setLoading(false);
         } catch (error) {
           console.error("Error fetching or creating user data: ", error);
+          setError(
+            "Failed to fetch or create user data. Please try again later."
+          );
+        } finally {
+          setLoading(false);
         }
       } else {
         if (
@@ -89,6 +94,10 @@ function App() {
 
   if (loading) {
     return <Loading />;
+  }
+
+  if (error) {
+    return <div className="error">{error}</div>;
   }
 
   return (

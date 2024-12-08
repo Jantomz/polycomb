@@ -9,15 +9,22 @@ const ViewCompetitionPosts = () => {
   const [posts, setPosts] = useState([]);
   const [filteredPosts, setFilteredPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchPosts = async () => {
       setLoading(true);
-      const posts = await getPosts({ competitionCode: code });
-      setLoading(false);
-      console.log(posts);
-      setPosts(posts);
-      setFilteredPosts(posts);
+      setError(null);
+      try {
+        const posts = await getPosts({ competitionCode: code });
+        setPosts(posts);
+        setFilteredPosts(posts);
+      } catch (err) {
+        console.error("Failed to fetch posts:", err);
+        setError("Failed to load posts. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchPosts();
@@ -30,6 +37,8 @@ const ViewCompetitionPosts = () => {
       </h1>
       {loading ? (
         <p className="text-yellow-600">Loading...</p>
+      ) : error ? (
+        <p className="text-red-600">{error}</p>
       ) : (
         <div className="space-y-4">
           <input

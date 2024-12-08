@@ -4,24 +4,37 @@ import useApi from "../../../hooks/useApi.js";
 
 const AdminEditTemplates = () => {
   const [templates, setTemplates] = useState([]);
+  const [error, setError] = useState(null);
   const { getCompetitionTemplates, deleteTemplate } = useApi();
   const { code } = useParams();
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchTemplates = async () => {
+      try {
+        const templates = await getCompetitionTemplates({
+          competitionCode: code,
+        });
+        setTemplates(templates);
+      } catch (err) {
+        setError("Failed to fetch templates. Please try again later.");
+        console.error(err);
+      }
+    };
+    fetchTemplates();
+  }, []);
+
+  const handleDeleteTemplate = async (templateId) => {
+    try {
+      await deleteTemplate({ templateId });
       const templates = await getCompetitionTemplates({
         competitionCode: code,
       });
       setTemplates(templates);
-    };
-    fetchTemplates();
-  }, [code]);
-
-  const handleDeleteTemplate = async (templateId) => {
-    await deleteTemplate({ templateId });
-    const templates = await getCompetitionTemplates({ competitionCode: code });
-    setTemplates(templates);
+    } catch (err) {
+      setError("Failed to delete template. Please try again later.");
+      console.error(err);
+    }
   };
 
   return (
@@ -29,6 +42,9 @@ const AdminEditTemplates = () => {
       <h1 className="text-3xl font-bold text-yellow-700 mb-6">
         Edit Templates
       </h1>
+      {error && (
+        <div className="bg-red-100 text-red-700 p-4 rounded mb-6">{error}</div>
+      )}
       <button
         onClick={() => navigate(`/competition/${code}/edit-templates/new`)}
         className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 mb-6"

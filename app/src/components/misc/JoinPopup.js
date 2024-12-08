@@ -9,24 +9,37 @@ const JoinPopup = ({ user, userData, setUserData, setShowJoinPopup }) => {
     const code = e.target.code.value;
     const userId = user.uid;
 
-    const updatedUser = await addCompetition({ code, userId });
+    try {
+      const updatedUser = await addCompetition({ code, userId });
 
-    if (updatedUser.error) {
-      console.log("Error joining competition", updatedUser.error);
-      return;
+      if (updatedUser.error) {
+        console.error(
+          "Error joining competition:",
+          updatedUser.error.message || updatedUser.error
+        );
+        alert("Failed to join competition. Please try again.");
+        return;
+      }
+
+      const competition = await addParticipant({ code, userId });
+
+      if (competition.error) {
+        console.error(
+          "Error adding participant to competition:",
+          competition.error.message || competition.error
+        );
+        alert("Failed to add participant to competition. Please try again.");
+        return;
+      }
+
+      setUserData(updatedUser);
+      setShowJoinPopup(false);
+
+      console.log("Successfully joined competition:", updatedUser);
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      alert("An unexpected error occurred. Please try again later.");
     }
-
-    const competition = await addParticipant({ code, userId });
-
-    if (competition.error) {
-      console.log("Error adding participant to competition", competition.error);
-      return;
-    }
-
-    setUserData(updatedUser);
-    setShowJoinPopup(false);
-
-    console.log("Joining competition", updatedUser);
   };
 
   return (

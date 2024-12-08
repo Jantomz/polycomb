@@ -7,7 +7,13 @@ const Logout = () => {
       await signOut(auth);
       console.log("Logged out successfully");
     } catch (err) {
-      console.error("Error logging out", err);
+      if (err.code === "auth/network-request-failed") {
+        console.error("Network error, please try again later.");
+      } else if (err.code === "auth/user-token-expired") {
+        console.error("Session expired, please log in again.");
+      } else {
+        console.error("Error logging out", err);
+      }
     }
   };
 
