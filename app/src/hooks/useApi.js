@@ -1,16 +1,16 @@
-const BASE_URL = "http://localhost:8080/api";
+const BASE_URL = "http://localhost:8080/api"; // Base URL for the API
 
 const useApi = () => {
   const apiRequest = async (url, options) => {
     try {
-      const response = await fetch(url, options);
+      const response = await fetch(url, options); // Make the API request
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`HTTP error! status: ${response.status}`); // Throw error if response is not ok
       }
-      return await response.json();
+      return await response.json(); // Parse and return JSON response
     } catch (error) {
-      console.error(`Error in API request to ${url}: `, error);
-      throw error;
+      console.error(`Error in API request to ${url}: `, error); // Log error to console
+      throw error; // Re-throw error to be handled by caller
     }
   };
 
@@ -25,7 +25,7 @@ const useApi = () => {
     try {
       const response = await apiRequest(`${BASE_URL}/competition`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" }, // Set content type to JSON
         body: JSON.stringify({
           title,
           description,
@@ -33,54 +33,54 @@ const useApi = () => {
           code,
           startDate,
           endDate,
-        }),
+        }), // Convert competition details to JSON string
       });
-      return response;
+      return response; // Return the response from the API
     } catch (error) {
-      console.error("Error creating competition:", error);
-      throw new Error("Failed to create competition. Please try again later.");
+      console.error("Error creating competition:", error); // Log error to console
+      throw new Error("Failed to create competition. Please try again later."); // Throw user-friendly error
     }
   };
 
   const getUser = async ({ uid }) => {
-    return apiRequest(`${BASE_URL}/auth/${uid}`, { method: "GET" });
+    return apiRequest(`${BASE_URL}/auth/${uid}`, { method: "GET" }); // Fetch user data by UID
   };
 
   const addCompetition = async ({ code, userId }) => {
     return apiRequest(`${BASE_URL}/user/add-competition`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code, userId }),
+      headers: { "Content-Type": "application/json" }, // Set content type to JSON
+      body: JSON.stringify({ code, userId }), // Convert data to JSON string
     });
   };
 
   const getUserCompetitions = async ({ userId }) => {
     return apiRequest(`${BASE_URL}/user/competitions/${userId}`, {
       method: "GET",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json" }, // Set content type to JSON
     });
   };
 
   const getCompetition = async ({ code }) => {
     return apiRequest(`${BASE_URL}/competition/${code}`, {
       method: "GET",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json" }, // Set content type to JSON
     });
   };
 
   const addParticipant = async ({ code, userId }) => {
     return apiRequest(`${BASE_URL}/competition/add-participant`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code, userId }),
+      headers: { "Content-Type": "application/json" }, // Set content type to JSON
+      body: JSON.stringify({ code, userId }), // Convert data to JSON string
     });
   };
 
   const updateSchedule = async ({ code, schedule }) => {
     return apiRequest(`${BASE_URL}/competition/update-schedule`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code, schedule }),
+      headers: { "Content-Type": "application/json" }, // Set content type to JSON
+      body: JSON.stringify({ code, schedule }), // Convert data to JSON string
     });
   };
 
@@ -92,8 +92,8 @@ const useApi = () => {
   }) => {
     return apiRequest(`${BASE_URL}/form/create-template`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, creatorId, competitionCode, fields }),
+      headers: { "Content-Type": "application/json" }, // Set content type to JSON
+      body: JSON.stringify({ title, creatorId, competitionCode, fields }), // Convert data to JSON string
     });
   };
 
@@ -102,7 +102,7 @@ const useApi = () => {
       `${BASE_URL}/form/competition-templates/${competitionCode}`,
       {
         method: "GET",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" }, // Set content type to JSON
       }
     );
   };
@@ -110,15 +110,15 @@ const useApi = () => {
   const getTemplate = async ({ templateId }) => {
     return apiRequest(`${BASE_URL}/form/templates/${templateId}`, {
       method: "GET",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json" }, // Set content type to JSON
     });
   };
 
   const submitForm = async ({ templateId, answers, signature, uid }) => {
-    const template = await getTemplate({ templateId });
+    const template = await getTemplate({ templateId }); // Fetch template details
 
     if (!template) {
-      console.error("Template not found");
+      console.error("Template not found"); // Log error if template not found
       return;
     }
 
@@ -129,7 +129,7 @@ const useApi = () => {
 
     return apiRequest(`${BASE_URL}/form/forms`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json" }, // Set content type to JSON
       body: JSON.stringify({
         title,
         creatorId,
@@ -138,7 +138,7 @@ const useApi = () => {
         fields,
         answers,
         signature,
-      }),
+      }), // Convert form data to JSON string
     });
   };
 
@@ -147,7 +147,7 @@ const useApi = () => {
       `${BASE_URL}/form/user-forms/${competitionCode}/${userId}`,
       {
         method: "GET",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" }, // Set content type to JSON
       }
     );
   };
@@ -155,35 +155,35 @@ const useApi = () => {
   const getTemplateForms = async ({ templateId }) => {
     return apiRequest(`${BASE_URL}/form/template-forms/${templateId}`, {
       method: "GET",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json" }, // Set content type to JSON
     });
   };
 
   const updateTimeline = async ({ code, timeline }) => {
     return apiRequest(`${BASE_URL}/competition/update-timeline`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code, timeline }),
+      headers: { "Content-Type": "application/json" }, // Set content type to JSON
+      body: JSON.stringify({ code, timeline }), // Convert data to JSON string
     });
   };
 
   const updateChecklist = async ({ code, checklist }) => {
     return apiRequest(`${BASE_URL}/competition/update-checklist`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code, checklist }),
+      headers: { "Content-Type": "application/json" }, // Set content type to JSON
+      body: JSON.stringify({ code, checklist }), // Convert data to JSON string
     });
   };
 
   const uploadFile = async ({ file, creatorId, competitionCode }) => {
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("creatorId", creatorId);
-    formData.append("competitionCode", competitionCode);
+    const formData = new FormData(); // Create a new FormData object
+    formData.append("file", file); // Append file to FormData
+    formData.append("creatorId", creatorId); // Append creatorId to FormData
+    formData.append("competitionCode", competitionCode); // Append competitionCode to FormData
 
     return apiRequest(`${BASE_URL}/file/`, {
       method: "POST",
-      body: formData,
+      body: formData, // Send FormData as body
     });
   };
 
@@ -210,7 +210,7 @@ const useApi = () => {
   }) => {
     return apiRequest(`${BASE_URL}/post/`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json" }, // Set content type to JSON
       body: JSON.stringify({
         title,
         content,
@@ -219,19 +219,19 @@ const useApi = () => {
         tags,
         description,
         images,
-      }),
+      }), // Convert post data to JSON string
     });
   };
 
   const deletePost = async ({ postId }) => {
-    return apiRequest(`${BASE_URL}/post/${postId}`, { method: "DELETE" });
+    return apiRequest(`${BASE_URL}/post/${postId}`, { method: "DELETE" }); // Delete post by ID
   };
 
   const updatePost = async ({ postId, post }) => {
     return apiRequest(`${BASE_URL}/post/${postId}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(post),
+      headers: { "Content-Type": "application/json" }, // Set content type to JSON
+      body: JSON.stringify(post), // Convert post data to JSON string
     });
   };
 
@@ -244,14 +244,14 @@ const useApi = () => {
   }) => {
     return apiRequest(`${BASE_URL}/wordlist`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json" }, // Set content type to JSON
       body: JSON.stringify({
         title,
         description,
         competitionCode,
         creatorId,
         words,
-      }),
+      }), // Convert wordlist data to JSON string
     });
   };
 
@@ -273,31 +273,31 @@ const useApi = () => {
   };
 
   const uploadAudio = async ({ audio, creatorId, wordId, oldAudioId }) => {
-    const formData = new FormData();
-    formData.append("audio", audio);
-    formData.append("creatorId", creatorId);
-    formData.append("wordId", wordId);
+    const formData = new FormData(); // Create a new FormData object
+    formData.append("audio", audio); // Append audio file to FormData
+    formData.append("creatorId", creatorId); // Append creatorId to FormData
+    formData.append("wordId", wordId); // Append wordId to FormData
 
     const data = await apiRequest(`${BASE_URL}/audio/`, {
       method: "POST",
-      body: formData,
+      body: formData, // Send FormData as body
     });
 
     if (data && data.dbAudio.audioId) {
       await apiRequest(`${BASE_URL}/wordlist/word/${wordId}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ audioId: data.dbAudio.audioId }),
+        headers: { "Content-Type": "application/json" }, // Set content type to JSON
+        body: JSON.stringify({ audioId: data.dbAudio.audioId }), // Update word with new audio ID
       });
 
       if (oldAudioId) {
         await apiRequest(`${BASE_URL}/audio/${oldAudioId}`, {
-          method: "DELETE",
+          method: "DELETE", // Delete old audio file
         });
       }
     }
 
-    return data;
+    return data; // Return the response data
   };
 
   const setWordlistPractice = async ({
@@ -308,8 +308,8 @@ const useApi = () => {
   }) => {
     return apiRequest(`${BASE_URL}/user/set-wordlist-practice`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId, wordlistId, order, currentIndex }),
+      headers: { "Content-Type": "application/json" }, // Set content type to JSON
+      body: JSON.stringify({ userId, wordlistId, order, currentIndex }), // Convert data to JSON string
     });
   };
 
@@ -328,8 +328,8 @@ const useApi = () => {
   const createUser = async ({ user }) => {
     return apiRequest(`${BASE_URL}/auth`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ uid: user.uid, email: user.email, role: "user" }),
+      headers: { "Content-Type": "application/json" }, // Set content type to JSON
+      body: JSON.stringify({ uid: user.uid, email: user.email, role: "user" }), // Convert user data to JSON string
     });
   };
 
@@ -349,10 +349,10 @@ const useApi = () => {
     });
 
     if (audioId) {
-      await apiRequest(`${BASE_URL}/audio/${audioId}`, { method: "DELETE" });
+      await apiRequest(`${BASE_URL}/audio/${audioId}`, { method: "DELETE" }); // Delete associated audio file
     }
 
-    return data;
+    return data; // Return the response data
   };
 
   const deleteWordlist = async ({ wordlistId }) => {
@@ -399,4 +399,4 @@ const useApi = () => {
   };
 };
 
-export default useApi;
+export default useApi; // Export the useApi hook

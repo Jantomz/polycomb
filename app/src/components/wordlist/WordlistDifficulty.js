@@ -1,48 +1,48 @@
-import useApi from "../../hooks/useApi.js";
-import useCSV from "../../hooks/useCSV.js";
-import { useState } from "react";
+import useApi from "../../hooks/useApi.js"; // Custom hook to interact with API
+import useCSV from "../../hooks/useCSV.js"; // Custom hook to handle CSV operations
+import { useState } from "react"; // React hook for state management
 
 const WordlistDifficulty = () => {
-  const { getWords } = useCSV();
-  const { generateWordFrequency } = useApi();
+  const { getWords } = useCSV(); // Destructure getWords function from useCSV hook
+  const { generateWordFrequency } = useApi(); // Destructure generateWordFrequency function from useApi hook
 
-  const [words, setWords] = useState([]);
-  const [file, setFile] = useState(null);
-  const [error, setError] = useState(null);
+  const [words, setWords] = useState([]); // State to store words from CSV
+  const [file, setFile] = useState(null); // State to store the selected file
+  const [error, setError] = useState(null); // State to store any errors
 
   const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
+    setFile(e.target.files[0]); // Update file state when a file is selected
   };
 
   const handleUpload = async () => {
     if (file) {
       try {
-        const words = await getWords(file);
-        setWords(words);
+        const words = await getWords(file); // Get words from the CSV file
+        setWords(words); // Update words state with the retrieved words
         const frequencies = await Promise.all(
           words.map(async (word) => {
             try {
               const frequency = await generateWordFrequency({
                 word: word.word,
-              });
-              const freq = frequency.frequency;
-              return { ...word, freq };
+              }); // Generate frequency for each word
+              const freq = frequency.frequency; // Extract frequency value
+              return { ...word, freq }; // Add frequency to the word object
             } catch (err) {
               console.error(
                 `Error generating frequency for word ${word.word}:`,
                 err
               );
-              return { ...word, freq: "Error" };
+              return { ...word, freq: "Error" }; // Handle error and set frequency to "Error"
             }
           })
         );
-        setWords(frequencies);
+        setWords(frequencies); // Update words state with frequencies
       } catch (err) {
         console.error("Error uploading file:", err);
-        setError("Failed to upload and process the file. Please try again.");
+        setError("Failed to upload and process the file. Please try again."); // Set error message
       }
     } else {
-      setError("Please select a file to upload.");
+      setError("Please select a file to upload."); // Set error message if no file is selected
     }
   };
 
@@ -57,11 +57,11 @@ const WordlistDifficulty = () => {
             className="border-2 border-yellow-300 p-2 rounded-lg mb-4 md:mb-0 w-full md:w-1/2"
             type="file"
             accept=".csv"
-            onChange={handleFileChange}
+            onChange={handleFileChange} // Handle file selection
           />
           <button
             className="bg-yellow-500 text-white py-2 px-4 rounded-lg hover:bg-yellow-600 transition duration-300 w-full md:w-auto"
-            onClick={handleUpload}
+            onClick={handleUpload} // Handle file upload
           >
             Upload CSV
           </button>
@@ -102,7 +102,7 @@ const WordlistDifficulty = () => {
                   "Sentence",
                   "Notes",
                   "Frequency",
-                ].join(",");
+                ].join(","); // Create CSV header
 
                 const csvContent =
                   "data:text/csv;charset=utf-8," +
@@ -121,18 +121,18 @@ const WordlistDifficulty = () => {
                         `"${word.freq}"`,
                       ].join(",")
                     )
-                    .join("\n");
+                    .join("\n"); // Create CSV content
 
-                const encodedUri = encodeURI(csvContent);
-                const link = document.createElement("a");
+                const encodedUri = encodeURI(csvContent); // Encode CSV content
+                const link = document.createElement("a"); // Create a download link
                 link.setAttribute("href", encodedUri);
-                link.setAttribute("download", "wordlist.csv");
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+                link.setAttribute("download", "wordlist.csv"); // Set download attribute
+                document.body.appendChild(link); // Append link to the body
+                link.click(); // Trigger download
+                document.body.removeChild(link); // Remove link after download
               } catch (err) {
                 console.error("Error downloading CSV:", err);
-                setError("Failed to download the CSV file. Please try again.");
+                setError("Failed to download the CSV file. Please try again."); // Set error message
               }
             }}
           >

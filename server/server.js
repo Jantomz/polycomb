@@ -23,15 +23,12 @@ const app = express();
 
 const cors = require("cors");
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3001; // setting the port from environment variable or default to 3001
 
-// creating middleware, any code that runs between an HTTP request and our response
-// the 'next' parameter is a function that will allow the middleware to move on to the next piece of middleware
-// this middleware will always run first before the app.get request handler
-
-// this middleware uses a middleware built into express, checking if the request has a body, if so, it will parse and attach it to the request object
+// middleware to parse JSON bodies with a size limit of 50mb
 app.use(express.json({ limit: "50mb" }));
 
+// enabling CORS for cross-origin requests
 app.use(
   cors()
   // {
@@ -45,20 +42,19 @@ const Grid = require("gridfs-stream");
 const methodOverride = require("method-override");
 const bodyParser = require("body-parser");
 
-let gfs;
-let gfsAudio;
+let gfs; // variable to hold GridFS stream for file uploads
+let gfsAudio; // variable to hold GridFS stream for audio uploads
 
-app.use(methodOverride("_method"));
+app.use(methodOverride("_method")); // allows overriding HTTP methods using query parameters
 
-// Middleware to attach gfs to the request object
+// Middleware to attach gfs and gfsAudio to the request object
 app.use((req, res, next) => {
   req.gfs = gfs;
   req.gfsAudio = gfsAudio;
   next();
 });
 
-// routes, connects all the routes defined in the workouts file to the app
-// has a pre route that means the routes will only fire once the pre route is fired
+// connecting all the routes to the app with a base path
 app.use("/api/auth", authRoutes);
 app.use("/api/competition", competitionRoutes);
 app.use("/api/user", userRoutes);
@@ -69,21 +65,21 @@ app.use("/api/wordlist", wordlistRoutes);
 app.use("/api/audio", audioRoutes);
 app.use("/api/tool", toolRoutes);
 
-// connect to db, it is await async and returns a promise, so we tack on a .then to tell the program what to do after it has completed the connection, catches errors too
+// connect to MongoDB using mongoose
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
     // listen for requests only if connected to database
-    // the function is called once the app is successfully listened on the port
     app.listen(PORT, () => {
       console.log(`Connected to DB and listening on port ${process.env.PORT}`);
-      // connecting to the gridfs stream
+      // initializing GridFS stream for file uploads
       gfs = Grid(mongoose.connection.db, mongoose.mongo);
-      gfs.collection("uploads");
+      gfs.collection("uploads"); // setting the collection name for file uploads
+      // initializing GridFS stream for audio uploads
       gfsAudio = Grid(mongoose.connection.db, mongoose.mongo);
-      gfsAudio.collection("audios");
+      gfsAudio.collection("audios"); // setting the collection name for audio uploads
     });
   })
   .catch((error) => {
-    console.log(error);
+    console.log(error); // log any connection errors
   });

@@ -1,47 +1,47 @@
-import { useParams, useNavigate } from "react-router-dom";
-import useApi from "../../../hooks/useApi.js";
-import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom"; // Import hooks for routing
+import useApi from "../../../hooks/useApi.js"; // Custom hook for API calls
+import { useEffect, useState } from "react"; // Import React hooks
 
 const Form = ({ user }) => {
-  const templateId = useParams().templateId;
-  const { getTemplate, submitForm } = useApi();
+  const templateId = useParams().templateId; // Get templateId from URL parameters
+  const { getTemplate, submitForm } = useApi(); // Destructure API functions from custom hook
 
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Hook for navigation
 
-  const [template, setTemplate] = useState(null);
-  const [error, setError] = useState(null);
+  const [template, setTemplate] = useState(null); // State to store template data
+  const [error, setError] = useState(null); // State to store error messages
 
   useEffect(() => {
     const fetchTemplate = async () => {
       try {
-        const template = await getTemplate({ templateId });
-        setTemplate(template);
+        const template = await getTemplate({ templateId }); // Fetch template data from API
+        setTemplate(template); // Set template state with fetched data
       } catch (err) {
-        console.error("Failed to fetch template:", err);
-        setError("Failed to load the template. Please try again later.");
+        console.error("Failed to fetch template:", err); // Log error to console
+        setError("Failed to load the template. Please try again later."); // Set error message
       }
     };
-    fetchTemplate();
-  }, []);
+    fetchTemplate(); // Call the fetch function
+  }, []); // Empty dependency array means this runs once on mount
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.target);
+    e.preventDefault(); // Prevent default form submission
+    const formData = new FormData(e.target); // Create FormData object from form
     const data = Object.fromEntries(
-      Array.from(formData.entries()).filter(([key]) => key !== "signature")
+      Array.from(formData.entries()).filter(([key]) => key !== "signature") // Convert FormData to object, excluding signature
     );
 
     try {
       await submitForm({
         templateId,
-        answers: data,
-        signature: e.target.signature.value,
-        uid: user.uid,
+        answers: data, // Form answers
+        signature: e.target.signature.value, // User's signature
+        uid: user.uid, // User ID
       });
-      navigate(`/competition/${template.competitionCode}`);
+      navigate(`/competition/${template.competitionCode}`); // Navigate to competition page
     } catch (err) {
-      console.error("Failed to submit form:", err);
-      setError("Failed to submit the form. Please try again later.");
+      console.error("Failed to submit form:", err); // Log error to console
+      setError("Failed to submit the form. Please try again later."); // Set error message
     }
   };
 
@@ -49,13 +49,15 @@ const Form = ({ user }) => {
     <div className="min-h-screen bg-yellow-50 flex items-center justify-center">
       <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-2xl">
         <h1 className="text-3xl font-bold text-yellow-600 mb-4">Form</h1>
-        {error && <div className="text-red-500 mb-4">{error}</div>}
+        {error && <div className="text-red-500 mb-4">{error}</div>}{" "}
+        {/* Display error message if any */}
         {template && (
           <div>
             <h3 className="text-xl font-semibold text-yellow-700 mb-2">
-              {template.title}
+              {template.title} {/* Display template title */}
             </h3>
-            <p className="text-yellow-600 mb-6">{template.description}</p>
+            <p className="text-yellow-600 mb-6">{template.description}</p>{" "}
+            {/* Display template description */}
             <form onSubmit={(e) => handleSubmit(e)} className="space-y-4">
               {template.fields.map((field) => (
                 <div key={field.name} className="flex flex-col">
@@ -63,13 +65,13 @@ const Form = ({ user }) => {
                     htmlFor={field.name}
                     className="text-yellow-700 font-medium mb-1"
                   >
-                    {field.name}
+                    {field.name} {/* Display field name */}
                   </label>
                   <input
                     autoComplete="off"
                     name={field.name}
-                    type={field.type}
-                    required={field.required}
+                    type={field.type} // Input type based on field type
+                    required={field.required} // Set required attribute if field is required
                     className="border border-yellow-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-yellow-500"
                   />
                 </div>
@@ -103,4 +105,4 @@ const Form = ({ user }) => {
   );
 };
 
-export default Form;
+export default Form; // Export the Form component

@@ -1,19 +1,22 @@
 const Post = ({ post }) => {
+  // Check if post is valid and is an object
   if (!post || typeof post !== "object") {
     return <div className="text-red-500">Invalid post data</div>;
   }
 
+  // Destructure post object to extract necessary fields
   const {
     _id,
     title,
     description,
     createdAt,
     updatedAt,
-    tags = [],
-    content = [],
-    images = [],
+    tags = [], // Default to empty array if tags are not provided
+    content = [], // Default to empty array if content is not provided
+    images = [], // Default to empty array if images are not provided
   } = post;
 
+  // Check if essential post data is present
   if (!_id || !title || !description || !createdAt || !updatedAt) {
     return <div className="text-red-500">Missing essential post data</div>;
   }
@@ -23,10 +26,12 @@ const Post = ({ post }) => {
       <h4 className="text-2xl font-semibold mb-2">{title}</h4>
       <p className="mb-4">{description}</p>
       <div className="text-sm text-gray-600">
+        {/* Display creation and update timestamps */}
         <p>Created at: {new Date(createdAt).toLocaleString()}</p>
         <p>Updated at: {new Date(updatedAt).toLocaleString()}</p>
       </div>
       <div className="mt-2">
+        {/* Render tags if they exist */}
         {Array.isArray(tags) &&
           tags.map((tag, index) => (
             <span
@@ -39,6 +44,7 @@ const Post = ({ post }) => {
       </div>
 
       <div className="text-left p-4 md:p-8 lg:p-12">
+        {/* Render content items and corresponding images */}
         {Array.isArray(content) &&
           content.map((contentItem, index) => (
             <div
@@ -56,6 +62,7 @@ const Post = ({ post }) => {
             </div>
           ))}
         <div className="flex flex-wrap justify-center gap-4 md:gap-8 lg:gap-12">
+          {/* Render remaining images if there are more images than content items */}
           {Array.isArray(images) &&
             images.slice(content.length).map((image, index) => (
               <div key={index} className="mb-4">
@@ -67,6 +74,7 @@ const Post = ({ post }) => {
               </div>
             ))}
         </div>
+        {/* Render remaining content items if there are more content items than images */}
         {Array.isArray(content) &&
           content.slice(images.length).map((contentItem, index) => (
             <div

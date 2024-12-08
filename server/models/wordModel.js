@@ -1,47 +1,47 @@
-// import mongoose as it is the component that allows schemas, MongoDB alone is schema-less
+// Import mongoose to use its schema capabilities, as MongoDB alone is schema-less
 const mongoose = require("mongoose");
 
-// initializing the mongoose schema object into our own object
+// Initialize the mongoose schema object into our own object
 const Schema = mongoose.Schema;
 
-// creating the schema object to model the properties of a word, defining the schema that must be adhered to
+// Create the schema object to model the properties of a word
 const wordSchema = new Schema(
   {
     word: {
-      type: String,
-      required: true,
+      type: String, // Define the type of the word property as String
+      required: true, // Make the word property mandatory
     },
     pronunciation: {
-      type: String,
-      required: true,
+      type: String, // Define the type of the pronunciation property as String
+      required: true, // Make the pronunciation property mandatory
     },
-    // The audio file id of the word
     audioId: {
-      type: String,
-      required: false,
+      type: String, // Define the type of the audioId property as String
+      required: false, // Make the audioId property optional
     },
     partOfSpeech: {
-      type: String,
-      required: true,
+      type: String, // Define the type of the partOfSpeech property as String
+      required: true, // Make the partOfSpeech property mandatory
     },
     definition: {
-      type: String,
-      required: true,
+      type: String, // Define the type of the definition property as String
+      required: true, // Make the definition property mandatory
     },
     etymology: {
-      type: String,
-      required: true,
+      type: String, // Define the type of the etymology property as String
+      required: true, // Make the etymology property mandatory
     },
     sentence: {
-      type: String,
-      required: true,
+      type: String, // Define the type of the sentence property as String
+      required: true, // Make the sentence property mandatory
     },
     notes: {
-      type: String,
-      required: false,
+      type: String, // Define the type of the notes property as String
+      required: false, // Make the notes property optional
     },
   },
-  { timestamps: true }
+  { timestamps: true } // Automatically add createdAt and updatedAt timestamps
 );
 
+// Export the model to use it in other parts of the application
 module.exports = mongoose.model("Word", wordSchema);

@@ -1,54 +1,60 @@
-import { useEffect, useState } from "react";
-import useApi from "../../../hooks/useApi.js";
-import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react"; // Importing necessary hooks from React
+import useApi from "../../../hooks/useApi.js"; // Custom hook for API calls
+import { useNavigate, useParams } from "react-router-dom"; // Hooks for navigation and URL parameters
 
 const AdminEditPosts = ({ userData }) => {
-  const { getPosts, deletePost, updatePost } = useApi();
-  const competitionCode = useParams().code;
-  const [posts, setPosts] = useState([]);
-  const [error, setError] = useState(null);
-  const navigate = useNavigate();
+  const { getPosts, deletePost, updatePost } = useApi(); // Destructuring API methods from custom hook
+  const competitionCode = useParams().code; // Extracting competition code from URL parameters
+  const [posts, setPosts] = useState([]); // State to store posts
+  const [error, setError] = useState(null); // State to store error messages
+  const navigate = useNavigate(); // Hook for navigation
 
   useEffect(() => {
     const performInitialRender = async () => {
       try {
-        const posts = await getPosts({ competitionCode });
-        setPosts(posts);
+        const posts = await getPosts({ competitionCode }); // Fetching posts based on competition code
+        setPosts(posts); // Setting fetched posts to state
       } catch (err) {
-        setError("Failed to fetch posts. Please try again later.");
-        console.error(err);
+        setError("Failed to fetch posts. Please try again later."); // Setting error message if fetch fails
+        console.error(err); // Logging error to console
       }
     };
-    performInitialRender();
-  }, [userData]);
+    performInitialRender(); // Calling the async function to fetch posts on component mount
+  }, [userData]); // Dependency array includes userData to refetch posts if userData changes
 
   const handleDeletePost = async (postId) => {
     try {
-      await deletePost({ postId });
-      setPosts(posts.filter((p) => p._id !== postId));
+      await deletePost({ postId }); // Deleting post by postId
+      setPosts(posts.filter((p) => p._id !== postId)); // Removing deleted post from state
     } catch (err) {
-      setError("Failed to delete post. Please try again later.");
-      console.error(err);
+      setError("Failed to delete post. Please try again later."); // Setting error message if delete fails
+      console.error(err); // Logging error to console
     }
   };
 
   const handleUpdatePost = async (post) => {
     try {
-      await updatePost({ postId: post._id, post });
-      navigate(`/competition/${competitionCode}`);
+      await updatePost({ postId: post._id, post }); // Updating post by postId
+      navigate(`/competition/${competitionCode}`); // Navigating back to competition page after update
     } catch (err) {
-      setError("Failed to update post. Please try again later.");
-      console.error(err);
+      setError("Failed to update post. Please try again later."); // Setting error message if update fails
+      console.error(err); // Logging error to console
     }
   };
 
   return (
     <div className="p-6 bg-yellow-50 min-h-screen">
-      <h1 className="text-3xl font-bold text-yellow-700 mb-6">Edit Posts</h1>
-      {error && <div className="text-red-500 mb-4">{error}</div>}
+      {" "}
+      {/* Container with padding and background color */}
+      <h1 className="text-3xl font-bold text-yellow-700 mb-6">
+        Edit Posts
+      </h1>{" "}
+      {/* Page title */}
+      {error && <div className="text-red-500 mb-4">{error}</div>}{" "}
+      {/* Displaying error message if any */}
       <button
         onClick={() => {
-          navigate(`/competition/${competitionCode}/edit-posts/new`);
+          navigate(`/competition/${competitionCode}/edit-posts/new`); // Navigating to create new post page
         }}
         className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 mb-4"
       >
@@ -62,21 +68,21 @@ const AdminEditPosts = ({ userData }) => {
           <input
             autoComplete="off"
             type="text"
-            value={post.title}
+            value={post.title} // Binding post title to input value
             onChange={(e) => {
               const updatedPosts = [...posts];
-              updatedPosts[postIndex].title = e.target.value;
-              setPosts(updatedPosts);
+              updatedPosts[postIndex].title = e.target.value; // Updating post title in state
+              setPosts(updatedPosts); // Setting updated posts to state
             }}
             className="w-full p-2 border border-yellow-300 rounded"
             placeholder="Post Title"
           />
           <textarea
-            value={post.description}
+            value={post.description} // Binding post description to textarea value
             onChange={(e) => {
               const updatedPosts = [...posts];
-              updatedPosts[postIndex].description = e.target.value;
-              setPosts(updatedPosts);
+              updatedPosts[postIndex].description = e.target.value; // Updating post description in state
+              setPosts(updatedPosts); // Setting updated posts to state
             }}
             className="w-full p-2 border border-yellow-300 rounded"
             placeholder="Post Description"
@@ -85,12 +91,12 @@ const AdminEditPosts = ({ userData }) => {
             {post.content.map((content, contentIndex) => (
               <div key={contentIndex} className="mb-2">
                 <textarea
-                  value={content}
+                  value={content} // Binding post content to textarea value
                   onChange={(e) => {
                     const updatedPosts = [...posts];
                     updatedPosts[postIndex].content[contentIndex] =
-                      e.target.value;
-                    setPosts(updatedPosts);
+                      e.target.value; // Updating post content in state
+                    setPosts(updatedPosts); // Setting updated posts to state
                   }}
                   className="w-full p-2 border border-yellow-300 rounded"
                   placeholder="Post Content"
@@ -104,18 +110,18 @@ const AdminEditPosts = ({ userData }) => {
                 <input
                   autoComplete="off"
                   type="text"
-                  value={image || ""}
+                  value={image || ""} // Binding image URL to input value
                   onChange={(e) => {
                     const updatedPosts = [...posts];
-                    updatedPosts[postIndex].images[imageIndex] = e.target.value;
-                    setPosts(updatedPosts);
+                    updatedPosts[postIndex].images[imageIndex] = e.target.value; // Updating image URL in state
+                    setPosts(updatedPosts); // Setting updated posts to state
                   }}
                   className="w-full p-2 border border-yellow-300 rounded"
                   placeholder="Image URL"
                 />
                 {image && (
                   <img
-                    src={image}
+                    src={image} // Displaying image if URL is present
                     alt="post"
                     className="mt-2 max-w-full h-auto rounded"
                   />
@@ -125,13 +131,13 @@ const AdminEditPosts = ({ userData }) => {
           </div>
           <div className="flex gap-4">
             <button
-              onClick={() => handleDeletePost(post._id)}
+              onClick={() => handleDeletePost(post._id)} // Handling post deletion
               className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
             >
               Delete
             </button>
             <button
-              onClick={() => handleUpdatePost(post)}
+              onClick={() => handleUpdatePost(post)} // Handling post update
               className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
             >
               Save
@@ -143,4 +149,4 @@ const AdminEditPosts = ({ userData }) => {
   );
 };
 
-export default AdminEditPosts;
+export default AdminEditPosts; // Exporting the component as default

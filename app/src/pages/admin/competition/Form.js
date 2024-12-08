@@ -1,81 +1,84 @@
-import { useParams } from "react-router-dom";
-import useApi from "../../../hooks/useApi.js";
-import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom"; // Importing useParams hook to get URL parameters
+import useApi from "../../../hooks/useApi.js"; // Custom hook to interact with API
+import { useEffect, useState } from "react"; // Importing React hooks
 
 const Form = ({ user }) => {
-  const templateId = useParams().templateId;
-  const { getTemplate, getTemplateForms } = useApi();
+  const templateId = useParams().templateId; // Extracting templateId from URL parameters
+  const { getTemplate, getTemplateForms } = useApi(); // Destructuring API methods from custom hook
 
-  const [template, setTemplate] = useState(null);
-  const [forms, setForms] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [error, setError] = useState(null);
+  const [template, setTemplate] = useState(null); // State to store template data
+  const [forms, setForms] = useState([]); // State to store forms data
+  const [searchTerm, setSearchTerm] = useState(""); // State to store search term
+  const [error, setError] = useState(null); // State to store error messages
 
   const handleSearch = (e) => {
-    setSearchTerm(e.target.value);
+    setSearchTerm(e.target.value); // Update search term state on input change
   };
 
   const parseSearchTerm = (term) => {
-    const andTerms = term.split(" AND ").map((t) => t.trim());
-    const orTerms = term.split(" OR ").map((t) => t.trim());
-    return { andTerms, orTerms };
+    const andTerms = term.split(" AND ").map((t) => t.trim()); // Split search term by "AND" and trim spaces
+    const orTerms = term.split(" OR ").map((t) => t.trim()); // Split search term by "OR" and trim spaces
+    return { andTerms, orTerms }; // Return parsed terms
   };
 
   const filteredForms = forms.filter((form) => {
-    const { andTerms, orTerms } = parseSearchTerm(searchTerm);
+    const { andTerms, orTerms } = parseSearchTerm(searchTerm); // Parse search term into AND and OR terms
 
     const matchesAndTerms = andTerms.every((term) =>
       form.answers.some((answer) =>
-        Object.values(answer).some((value) =>
-          value.toLowerCase().includes(term.toLowerCase())
+        Object.values(answer).some(
+          (value) => value.toLowerCase().includes(term.toLowerCase()) // Check if all AND terms match
         )
       )
     );
 
     const matchesOrTerms = orTerms.some((term) =>
       form.answers.some((answer) =>
-        Object.values(answer).some((value) =>
-          value.toLowerCase().includes(term.toLowerCase())
+        Object.values(answer).some(
+          (value) => value.toLowerCase().includes(term.toLowerCase()) // Check if any OR term matches
         )
       )
     );
 
-    return matchesAndTerms || matchesOrTerms;
+    return matchesAndTerms || matchesOrTerms; // Return true if either AND or OR terms match
   });
 
   useEffect(() => {
     const fetchTemplate = async () => {
       try {
-        const template = await getTemplate({ templateId });
-        setTemplate(template);
+        const template = await getTemplate({ templateId }); // Fetch template data from API
+        setTemplate(template); // Update template state
       } catch (error) {
-        console.error("Failed to fetch template:", error);
-        setError("Failed to fetch template.");
+        console.error("Failed to fetch template:", error); // Log error to console
+        setError("Failed to fetch template."); // Update error state
       }
     };
 
     const fetchForms = async () => {
       try {
-        const forms = await getTemplateForms({ templateId });
-        setForms(forms);
+        const forms = await getTemplateForms({ templateId }); // Fetch forms data from API
+        setForms(forms); // Update forms state
       } catch (error) {
-        console.error("Failed to fetch forms:", error);
-        setError("Failed to fetch forms.");
+        console.error("Failed to fetch forms:", error); // Log error to console
+        setError("Failed to fetch forms."); // Update error state
       }
     };
 
-    fetchTemplate();
-    fetchForms();
-  }, [templateId]);
+    fetchTemplate(); // Call fetchTemplate function
+    fetchForms(); // Call fetchForms function
+  }, [templateId]); // Dependency array to re-run effect when templateId changes
 
   return (
     <div className="p-6 bg-yellow-50 min-h-screen">
       <h1 className="text-3xl font-bold text-yellow-700 mb-4">Form Preview</h1>
-      {error && <div className="text-red-500 mb-4">{error}</div>}
+      {error && <div className="text-red-500 mb-4">{error}</div>}{" "}
+      {/* Display error message if any */}
       {template && (
         <div className="mb-8">
-          <h3 className="text-xl text-yellow-700">{template.title}</h3>
-          <p className="text-yellow-600 mb-4">{template.description}</p>
+          <h3 className="text-xl text-yellow-700">{template.title}</h3>{" "}
+          {/* Display template title */}
+          <p className="text-yellow-600 mb-4">{template.description}</p>{" "}
+          {/* Display template description */}
           <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
             {template.fields.map((field) => (
               <div key={field.name} className="flex flex-col">
@@ -113,26 +116,25 @@ const Form = ({ user }) => {
         </div>
       )}
       <h1 className="text-2xl font-semibold text-yellow-600 mb-2">
-        Form Responses ({forms.length})
+        Form Responses ({forms.length}) {/* Display number of form responses */}
       </h1>
       <h2 className="text-xl text-yellow-700 mb-2">Search: </h2>
-
       <input
         autoComplete="off"
         type="text"
         value={searchTerm}
-        onChange={handleSearch}
+        onChange={handleSearch} // Update search term on input change
         placeholder="Search..."
         className="p-2 border border-yellow-300 rounded mb-4"
       />
-
       <div className="space-y-4 flex flex-wrap justify-center">
         {filteredForms.map((form) => (
           <div
             key={form._id}
             className="p-4 border border-yellow-300 rounded bg-yellow-100 w-[300px]"
           >
-            <h3 className="text-xl text-yellow-700">Response: {form.title}</h3>
+            <h3 className="text-xl text-yellow-700">Response: {form.title}</h3>{" "}
+            {/* Display form response title */}
             {form.answers.map((answer) =>
               form.fields.map((field) => (
                 <div
@@ -142,8 +144,8 @@ const Form = ({ user }) => {
                   <label htmlFor={field.name} className="text-yellow-700">
                     {field.name}-
                   </label>
-
-                  <div className="text-yellow-600">{answer[field.name]}</div>
+                  <div className="text-yellow-600">{answer[field.name]}</div>{" "}
+                  {/* Display form field answer */}
                 </div>
               ))
             )}
@@ -154,4 +156,4 @@ const Form = ({ user }) => {
   );
 };
 
-export default Form;
+export default Form; // Exporting Form component as default

@@ -4,8 +4,8 @@ import {
   Route,
   Routes,
   Navigate,
-} from "react-router-dom";
-import useAuth from "./hooks/useAuth.js";
+} from "react-router-dom"; // Importing necessary components from react-router-dom for routing
+import useAuth from "./hooks/useAuth.js"; // Custom hook for authentication
 import AdminDashboard from "./pages/admin/Dashboard.js";
 import UserDashboard from "./pages/user/Dashboard.js";
 
@@ -17,7 +17,8 @@ import UserForm from "./pages/user/competition/Form.js";
 
 import Register from "./pages/auth/Register.js";
 import Login from "./pages/auth/Login.js";
-import { useEffect, useState } from "react";
+import { useEffect, useState } from "react"; // Importing hooks from React
+
 import CreateCompetition from "./pages/admin/CreateCompetition.js";
 import AdminEditSchedule from "./pages/admin/competition/AdminEditSchedule.js";
 import AdminEditTimeline from "./pages/admin/competition/AdminEditTimeline.js";
@@ -30,7 +31,8 @@ import AdminCreateWordlist from "./pages/admin/competition/AdminCreateWordlist.j
 import AdminEditWordlist from "./pages/admin/competition/AdminEditWordlist.js";
 import ViewWordlist from "./pages/user/competition/ViewWordlist.js";
 import WordlistPractice from "./pages/user/competition/WordlistPractice.js";
-import useApi from "./hooks/useApi.js";
+
+import useApi from "./hooks/useApi.js"; // Custom hook for API calls
 import Navbar from "./components/misc/Navbar.js";
 import ViewCompetitionPosts from "./pages/ViewCompetitionPosts.js";
 import ViewCompetitionSchedule from "./pages/ViewCompetitionSchedule.js";
@@ -41,22 +43,23 @@ import Loading from "./pages/Loading.js";
 import NotFound from "./pages/NotFound.js";
 
 function App() {
-  const user = useAuth();
-  const { getUser, createUser } = useApi();
+  const user = useAuth(); // Get the authenticated user
+  const { getUser, createUser } = useApi(); // Destructure API functions
 
-  const [userData, setUserData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [userData, setUserData] = useState(null); // State to store user data
+  const [loading, setLoading] = useState(true); // State to manage loading state
+  const [error, setError] = useState(null); // State to manage error messages
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if (user) {
+      if (user && user.uid) {
+        // Check if user is authenticated
         try {
-          const data = await getUser({ uid: user.uid });
+          const data = await getUser({ uid: user.uid }); // Fetch user data from API
           if (data.length === 1) {
-            setUserData(data[0]);
+            setUserData(data[0]); // Set user data if found
           } else {
-            const createdUserData = await createUser(user);
+            const createdUserData = await createUser({ user }); // Create new user if not found
             setUserData(createdUserData);
           }
         } catch (error) {
@@ -65,46 +68,46 @@ function App() {
             "Failed to fetch or create user data. Please try again later."
           );
         } finally {
-          setLoading(false);
+          setLoading(false); // Set loading to false after fetching data
         }
       } else {
         if (
           window.location.pathname === "/login" ||
           window.location.pathname === "/register"
         ) {
-          setLoading(false);
+          setLoading(false); // Set loading to false if on login or register page
         }
       }
     };
 
-    fetchUserData();
-  }, [user]);
+    fetchUserData(); // Call the function to fetch user data
+  }, [user]); // Dependency array to re-run effect when user changes
 
   const renderRoute = (adminComponent, userComponent) => {
     return user ? (
       userData && userData.role === "admin" ? (
-        adminComponent
+        adminComponent // Render admin component if user is admin
       ) : (
-        userComponent
+        userComponent // Render user component if user is not admin
       )
     ) : (
-      <Navigate to="/login" />
+      <Navigate to="/login" /> // Redirect to login if user is not authenticated
     );
   };
 
   if (loading) {
-    return <Loading />;
+    return <Loading />; // Show loading component while data is being fetched
   }
 
   if (error) {
-    return <div className="error">{error}</div>;
+    return <div className="error">{error}</div>; // Show error message if there's an error
   }
 
   return (
     <Router>
-      <Navbar user={user} />
+      <Navbar user={user} /> {/* Navbar component */}
       <div className="App p-12 max-md:p-4 min-h-screen bg-yellow-100">
-        <BackButton />
+        <BackButton /> {/* Back button component */}
         <Routes>
           <Route
             path="/"
@@ -267,8 +270,7 @@ function App() {
               )
             }
           />
-
-          <Route path="*" element={<NotFound />} />
+          <Route path="*" element={<NotFound />} /> {/* 404 Not Found route */}
         </Routes>
       </div>
     </Router>

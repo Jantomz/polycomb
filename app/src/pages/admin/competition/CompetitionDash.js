@@ -14,28 +14,28 @@ const CompetitionDash = ({ user }) => {
     getUsers,
     getTemplateForms,
     deleteFile,
-  } = useApi();
+  } = useApi(); // Custom hook to handle API calls
 
-  const { code } = useParams();
+  const { code } = useParams(); // Get competition code from URL parameters
 
-  const [file, setFile] = useState(null);
+  const [file, setFile] = useState(null); // State to store the selected file
 
-  const [forms, setForms] = useState([]);
+  const [forms, setForms] = useState([]); // State to store forms data
 
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState([]); // State to store users data
 
-  const [files, setFiles] = useState([]);
+  const [files, setFiles] = useState([]); // State to store files data
 
-  const [wordlists, setWordlists] = useState([]);
+  const [wordlists, setWordlists] = useState([]); // State to store wordlists data
 
-  const [templates, setTemplates] = useState([]);
-  const [competition, setCompetition] = useState(null);
-  const [loading, setLoading] = useState(false); // New loading state
-  const [error, setError] = useState(null); // New error state
+  const [templates, setTemplates] = useState([]); // State to store templates data
+  const [competition, setCompetition] = useState(null); // State to store competition data
+  const [loading, setLoading] = useState(false); // State to handle loading status
+  const [error, setError] = useState(null); // State to handle error messages
 
   const fetchFiles = async () => {
     try {
-      const files = await getFiles({ competitionCode: code });
+      const files = await getFiles({ competitionCode: code }); // Fetch files related to the competition
       setFiles(files);
     } catch (err) {
       console.error("Error fetching files:", err);
@@ -46,10 +46,10 @@ const CompetitionDash = ({ user }) => {
   useEffect(() => {
     const fetchCompetition = async () => {
       try {
-        const competition = await getCompetition({ code: code });
+        const competition = await getCompetition({ code: code }); // Fetch competition details
         setCompetition(competition);
 
-        const users = await getUsers({ competitionCode: code });
+        const users = await getUsers({ competitionCode: code }); // Fetch users participating in the competition
         setUsers(users);
       } catch (err) {
         console.error("Error fetching competition or users:", err);
@@ -62,12 +62,12 @@ const CompetitionDash = ({ user }) => {
       try {
         const templates = await getCompetitionTemplates({
           competitionCode: code,
-        });
+        }); // Fetch templates related to the competition
         setTemplates(templates);
         const forms = await getTemplateForms({
           templateId: templates.find(
             (template) => template.title === "General Information Form"
-          )?._id,
+          )?._id, // Find the template with the title "General Information Form"
         });
         setForms(forms);
       } catch (err) {
@@ -82,7 +82,7 @@ const CompetitionDash = ({ user }) => {
 
     const fetchWordlists = async () => {
       try {
-        const wordlists = await getWordlists({ competitionCode: code });
+        const wordlists = await getWordlists({ competitionCode: code }); // Fetch wordlists related to the competition
         setWordlists(wordlists);
       } catch (err) {
         console.error("Error fetching wordlists:", err);
@@ -101,19 +101,19 @@ const CompetitionDash = ({ user }) => {
     const files = file.target.files;
     const handleFileUpload = async () => {
       try {
-        setLoading(true); // Set loading to true
+        setLoading(true); // Set loading to true while uploading
         await uploadFile({
           file: files[0],
           competitionCode: code,
           creatorId: user.uid,
-        });
-        fetchFiles();
+        }); // Upload the selected file
+        fetchFiles(); // Refresh the files list after upload
         file.target.value = null;
       } catch (err) {
         console.error("Error uploading file:", err);
         setError("Failed to upload file.");
       } finally {
-        setLoading(false); // Set loading to false
+        setLoading(false); // Set loading to false after upload
       }
     };
     handleFileUpload();
@@ -490,19 +490,20 @@ const CompetitionDash = ({ user }) => {
 };
 
 export default CompetitionDash;
+
 const ParticipantStatsGraph = ({ users, forms }) => {
-  const grades = forms.map((form) => parseInt(form.answers[0].Grade, 10));
+  const grades = forms.map((form) => parseInt(form.answers[0].Grade, 10)); // Extract grades from forms
   const gradeFrequency = grades.reduce((acc, grade) => {
-    acc[grade] = (acc[grade] || 0) + 1;
+    acc[grade] = (acc[grade] || 0) + 1; // Calculate frequency of each grade
     return acc;
   }, {});
 
   const data = {
-    labels: Object.keys(gradeFrequency),
+    labels: Object.keys(gradeFrequency), // Labels for the chart
     datasets: [
       {
         label: "Frequency of Grades",
-        data: Object.values(gradeFrequency),
+        data: Object.values(gradeFrequency), // Data for the chart
         backgroundColor: "rgba(255, 206, 86, 0.2)",
         borderColor: "rgba(255, 206, 86, 1)",
         borderWidth: 1,
@@ -513,7 +514,7 @@ const ParticipantStatsGraph = ({ users, forms }) => {
   const options = {
     scales: {
       y: {
-        beginAtZero: true,
+        beginAtZero: true, // Ensure y-axis starts at zero
       },
     },
   };
@@ -521,7 +522,7 @@ const ParticipantStatsGraph = ({ users, forms }) => {
   return (
     <div className="mb-8">
       <h3 className="text-2xl font-semibold mb-2">Participant Stats Graph</h3>
-      <Bar data={data} options={options} />
+      <Bar data={data} options={options} /> {/* Render bar chart */}
     </div>
   );
 };

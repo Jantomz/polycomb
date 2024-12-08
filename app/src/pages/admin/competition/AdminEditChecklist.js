@@ -1,45 +1,45 @@
-import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import useApi from "../../../hooks/useApi.js";
+import { useEffect, useState } from "react"; // Importing hooks from React
+import { useParams, useNavigate } from "react-router-dom"; // Importing hooks from react-router-dom for routing
+import useApi from "../../../hooks/useApi.js"; // Custom hook for API calls
 
 const AdminEditChecklist = () => {
-  const [tasks, setTasks] = useState([]);
-  const { updateChecklist, getCompetition, getCompetitionTemplates } = useApi();
-  const { code } = useParams();
-  const [competition, setCompetition] = useState(null);
-  const [conditions, setConditions] = useState([]);
-  const navigate = useNavigate();
-  const [error, setError] = useState(null);
+  const [tasks, setTasks] = useState([]); // State to store tasks
+  const { updateChecklist, getCompetition, getCompetitionTemplates } = useApi(); // Destructuring API functions from custom hook
+  const { code } = useParams(); // Getting competition code from URL parameters
+  const [competition, setCompetition] = useState(null); // State to store competition details
+  const [conditions, setConditions] = useState([]); // State to store conditions for tasks
+  const navigate = useNavigate(); // Hook to navigate programmatically
+  const [error, setError] = useState(null); // State to store error messages
 
   useEffect(() => {
     const fetchCompetition = async () => {
       try {
-        const competition = await getCompetition({ code });
-        setCompetition(competition);
+        const competition = await getCompetition({ code }); // Fetch competition details using API
+        setCompetition(competition); // Set competition state
         if (competition?.checklist) {
-          setTasks(competition.checklist);
+          setTasks(competition.checklist); // Set tasks if checklist exists
         }
       } catch (err) {
-        console.error("Failed to fetch competition:", err);
-        setError("Failed to fetch competition. Please try again later.");
+        console.error("Failed to fetch competition:", err); // Log error to console
+        setError("Failed to fetch competition. Please try again later."); // Set error message
       }
     };
-    fetchCompetition();
+    fetchCompetition(); // Call fetchCompetition function
 
     const fetchForms = async () => {
       try {
-        const forms = await getCompetitionTemplates({ competitionCode: code });
+        const forms = await getCompetitionTemplates({ competitionCode: code }); // Fetch competition templates
         setConditions(
-          forms.map((form) => `COMPLETE ${form.title} (${form._id})`)
+          forms.map((form) => `COMPLETE ${form.title} (${form._id})`) // Map forms to conditions
         );
       } catch (err) {
-        console.error("Failed to fetch forms:", err);
-        setError("Failed to fetch forms. Please try again later.");
+        console.error("Failed to fetch forms:", err); // Log error to console
+        setError("Failed to fetch forms. Please try again later."); // Set error message
       }
     };
 
-    fetchForms();
-  }, []);
+    fetchForms(); // Call fetchForms function
+  }, []); // Empty dependency array to run effect only once
 
   const addEvent = () => {
     setTasks([
@@ -47,46 +47,47 @@ const AdminEditChecklist = () => {
       {
         name: "",
         description: "",
-        dueDate: competition?.startDate,
+        dueDate: competition?.startDate, // Default due date to competition start date
         condition: "",
       },
     ]);
   };
 
   const removeEvent = (index) => {
-    setTasks(tasks.filter((_, i) => i !== index));
+    setTasks(tasks.filter((_, i) => i !== index)); // Remove task by index
   };
 
   const handleEventChange = (index, field, value) => {
-    const newEvents = tasks.map((event, i) =>
-      i === index ? { ...event, [field]: value } : event
+    const newEvents = tasks.map(
+      (event, i) => (i === index ? { ...event, [field]: value } : event) // Update task field by index
     );
-    setTasks(newEvents);
+    setTasks(newEvents); // Set updated tasks
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+    e.preventDefault(); // Prevent default form submission
 
     const submitChecklist = async () => {
       try {
-        await updateChecklist({ code, checklist: tasks });
-        navigate(`/competition/${code}`);
+        await updateChecklist({ code, checklist: tasks }); // Update checklist using API
+        navigate(`/competition/${code}`); // Navigate to competition page
       } catch (err) {
-        console.error("Failed to update checklist:", err);
-        setError("Failed to update checklist. Please try again later.");
+        console.error("Failed to update checklist:", err); // Log error to console
+        setError("Failed to update checklist. Please try again later."); // Set error message
       }
     };
 
-    submitChecklist();
+    submitChecklist(); // Call submitChecklist function
   };
 
   return (
     <div className="p-6 bg-yellow-50 min-h-screen">
       <h1 className="text-3xl font-bold text-yellow-700 mb-6">
-        Edit Checklist for {competition?.title}
+        Edit Checklist for {competition?.title}{" "}
+        {/* Display competition title */}
       </h1>
       {error && (
-        <div className="bg-red-100 text-red-700 p-4 rounded mb-6">{error}</div>
+        <div className="bg-red-100 text-red-700 p-4 rounded mb-6">{error}</div> // Display error message if exists
       )}
       <form onSubmit={(e) => handleSubmit(e)} className="space-y-6">
         {tasks.map((task, index) => (
@@ -98,7 +99,7 @@ const AdminEditChecklist = () => {
               htmlFor={`task-${index}-name`}
               className="block text-yellow-700 font-semibold"
             >
-              Task {index + 1}
+              Task {index + 1} {/* Display task number */}
             </label>
             <input
               autoComplete="off"
@@ -156,7 +157,7 @@ const AdminEditChecklist = () => {
               <option value="">None</option>
               {conditions.map((condition) => (
                 <option key={condition} value={condition}>
-                  {condition}
+                  {condition} {/* Display condition options */}
                 </option>
               ))}
             </select>
@@ -189,4 +190,4 @@ const AdminEditChecklist = () => {
   );
 };
 
-export default AdminEditChecklist;
+export default AdminEditChecklist; // Exporting component as default

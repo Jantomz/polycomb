@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState } from "react"; // Importing useState hook from React
 
 const WordlistGenerator = () => {
-  const [size, setSize] = useState(0);
+  const [size, setSize] = useState(0); // Declaring state variable 'size' with initial value 0
 
   return (
     <div className="flex flex-col items-center justify-center w-full sm:w-max">
@@ -14,11 +14,11 @@ const WordlistGenerator = () => {
           className="border-2 border-yellow-300 p-2 rounded-lg mb-4 w-full"
           type="number"
           name="size"
-          onChange={(e) => setSize(e.target.value)}
-          value={size}
+          onChange={(e) => setSize(e.target.value)} // Update 'size' state when input value changes
+          value={size} // Bind input value to 'size' state
         />
         <a
-          href={`http://localhost:8080/api/tool/generate-wordlist/${size}`}
+          href={`http://localhost:8080/api/tool/generate-wordlist/${size}`} // Dynamic URL based on 'size' state
           className="bg-yellow-500 text-white py-2 px-4 rounded-lg hover:bg-yellow-600 transition duration-300 block text-center"
         >
           Generate
@@ -28,4 +28,4 @@ const WordlistGenerator = () => {
   );
 };
 
-export default WordlistGenerator;
+export default WordlistGenerator; // Exporting the component as default

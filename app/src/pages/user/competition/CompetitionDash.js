@@ -1,50 +1,50 @@
-import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import useApi from "../../../hooks/useApi.js";
+import { useEffect, useState } from "react"; // Importing necessary hooks from React
+import { Link, useParams } from "react-router-dom"; // Importing components from react-router-dom for navigation
+import useApi from "../../../hooks/useApi.js"; // Custom hook to interact with API
 
 const CompetitionDash = ({ user }) => {
-  const { getCompetition, getUserForms, getWordlists } = useApi();
+  const { getCompetition, getUserForms, getWordlists } = useApi(); // Destructuring API methods from custom hook
 
-  const { code } = useParams();
-  const [competition, setCompetition] = useState(null);
-  const [forms, setForms] = useState([]);
-  const [wordlists, setWordlists] = useState([]);
-  const [error, setError] = useState(null);
+  const { code } = useParams(); // Extracting competition code from URL parameters
+  const [competition, setCompetition] = useState(null); // State to store competition data
+  const [forms, setForms] = useState([]); // State to store user forms
+  const [wordlists, setWordlists] = useState([]); // State to store wordlists
+  const [error, setError] = useState(null); // State to store error messages
 
   useEffect(() => {
     const fetchCompetition = async () => {
       try {
-        const competition = await getCompetition({ code: code });
-        setCompetition(competition);
+        const competition = await getCompetition({ code: code }); // Fetching competition data
+        setCompetition(competition); // Updating state with fetched competition data
       } catch (err) {
-        setError("Failed to fetch competition data.");
+        setError("Failed to fetch competition data."); // Setting error message if fetching fails
       }
     };
-    fetchCompetition();
+    fetchCompetition(); // Calling the function to fetch competition data
 
     const fetchForms = async () => {
       try {
         const forms = await getUserForms({
           competitionCode: code,
           userId: user.uid,
-        });
-        setForms(forms);
+        }); // Fetching user forms
+        setForms(forms); // Updating state with fetched forms
       } catch (err) {
-        setError("Failed to fetch user forms.");
+        setError("Failed to fetch user forms."); // Setting error message if fetching fails
       }
     };
-    fetchForms();
+    fetchForms(); // Calling the function to fetch user forms
 
     const fetchWordlists = async () => {
       try {
-        const wordlists = await getWordlists({ competitionCode: code });
-        setWordlists(wordlists);
+        const wordlists = await getWordlists({ competitionCode: code }); // Fetching wordlists
+        setWordlists(wordlists); // Updating state with fetched wordlists
       } catch (err) {
-        setError("Failed to fetch wordlists.");
+        setError("Failed to fetch wordlists."); // Setting error message if fetching fails
       }
     };
-    fetchWordlists();
-  }, []);
+    fetchWordlists(); // Calling the function to fetch wordlists
+  }, []); // Empty dependency array ensures this effect runs only once
 
   return (
     <div className="bg-yellow-50 text-gray-800">
@@ -82,7 +82,7 @@ const CompetitionDash = ({ user }) => {
         <main className="flex-1 p-6">
           {error && (
             <div className="fixed top-0 left-0 right-0 bg-red-500 text-white p-4 text-center">
-              {error}
+              {error} {/* Displaying error message if any */}
             </div>
           )}
           {competition ? (
@@ -108,16 +108,16 @@ const CompetitionDash = ({ user }) => {
                 <h3 className="text-2xl font-semibold mb-2">Checklist</h3>
                 {competition.checklist.length > 0 ? (
                   competition.checklist.map((item) => {
-                    const isComplete = item.condition.startsWith("COMPLETE");
+                    const isComplete = item.condition.startsWith("COMPLETE"); // Checking if the checklist item is complete
                     const formId = isComplete
                       ? item.condition.match(/\(([^)]+)\)/)[1]
-                      : null;
+                      : null; // Extracting form ID if the item is complete
                     const form = forms.find(
                       (form) => form.templateId === formId
-                    );
+                    ); // Finding the form with the extracted form ID
                     let isChecked = false;
                     if (form) {
-                      isChecked = true;
+                      isChecked = true; // Marking the checklist item as checked if the form is found
                     }
 
                     return (
@@ -177,4 +177,4 @@ const CompetitionDash = ({ user }) => {
   );
 };
 
-export default CompetitionDash;
+export default CompetitionDash; // Exporting the component as default

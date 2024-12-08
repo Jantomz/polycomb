@@ -1,60 +1,64 @@
-// import mongoose as it is the component that allows schemas, MongoDB alone is schema-less
+// Import mongoose to define schemas, as MongoDB alone is schema-less
 const mongoose = require("mongoose");
 
-// initializing the mongoose schema object into our own object
+// Initialize the mongoose schema object
 const Schema = mongoose.Schema;
 
-// creating the schema object to model the properties of a workout, defining the schema that must be adhered to
+// Define the schema for a competition
 const competitionSchema = new Schema(
   {
-    // Making the code 5 digits unique
+    // Code must be a unique 5-digit string
     code: {
       type: String,
-      required: true,
-      unique: true,
-      index: true, // Adding index to make it a primary key
+      required: true, // Code is mandatory
+      unique: true, // Code must be unique
+      index: true, // Indexing for faster queries
       match: [/^\d{5}$/, "Code must be 5 digits"], // Regex to ensure it's 5 digits
     },
+    // List of participant IDs
     participants: [String],
-    // The admins of the competition
+    // List of admin IDs
     admins: [String],
+    // Checklist items, default to an empty array
     checklist: {
       type: Array,
       default: [],
     },
-
+    // Timeline events, default to an empty array
     timeline: {
       type: Array,
       default: [],
     },
+    // Schedule items, default to an empty array
     schedule: {
       type: Array,
       default: [],
     },
-    // The start date of the competition
+    // Start date of the competition
     startDate: {
       type: Date,
-      required: true,
+      required: true, // Start date is mandatory
     },
-    // The end date of the competition
+    // End date of the competition
     endDate: {
       type: Date,
-      required: true,
+      required: true, // End date is mandatory
     },
-    // The title of the competition
+    // Title of the competition
     title: {
       type: String,
-      required: true,
+      required: true, // Title is mandatory
     },
-    // The description of the competition
+    // Description of the competition
     description: {
       type: String,
-      required: true,
+      required: true, // Description is mandatory
     },
   },
-  { timestamps: true }
+  { timestamps: true } // Automatically add createdAt and updatedAt fields
 );
 
-competitionSchema.index({ code: 1 }, { unique: true }); // Ensuring uid is indexed and unique
+// Ensure the code field is indexed and unique
+competitionSchema.index({ code: 1 }, { unique: true });
 
 module.exports = mongoose.model("Competition", competitionSchema);

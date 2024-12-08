@@ -1,22 +1,22 @@
-import { useNavigate, useParams } from "react-router-dom";
-import useApi from "../../../hooks/useApi.js";
-import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom"; // Importing hooks from react-router-dom for navigation and URL parameters
+import useApi from "../../../hooks/useApi.js"; // Custom hook for API calls
+import { useEffect, useState } from "react"; // Importing React hooks
 
 const WordlistPractice = ({ user, userData, setUserData }) => {
-  const competitionCode = useParams().code;
-  const wordlistId = useParams().wordlistId;
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [order, setOrder] = useState([]);
-  const [currentWord, setCurrentWord] = useState(null);
-  const [wordlist, setWordlist] = useState(null);
-  const [usersGuess, setUsersGuess] = useState("");
-  const [isIncorrect, setIsIncorrect] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const competitionCode = useParams().code; // Extracting competition code from URL parameters
+  const wordlistId = useParams().wordlistId; // Extracting wordlist ID from URL parameters
+  const [currentIndex, setCurrentIndex] = useState(0); // State to track the current index in the wordlist
+  const [order, setOrder] = useState([]); // State to store the randomized order of words
+  const [currentWord, setCurrentWord] = useState(null); // State to store the current word object
+  const [wordlist, setWordlist] = useState(null); // State to store the entire wordlist
+  const [usersGuess, setUsersGuess] = useState(""); // State to store the user's guess
+  const [isIncorrect, setIsIncorrect] = useState(false); // State to track if the user's guess is incorrect
+  const [loading, setLoading] = useState(false); // State to track loading status
+  const [error, setError] = useState(null); // State to store any error messages
 
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Hook for navigation
 
-  const { getWordlist, setWordlistPractice, getWord } = useApi();
+  const { getWordlist, setWordlistPractice, getWord } = useApi(); // Destructuring API functions from custom hook
 
   const uploadWordlistPractice = async ({
     orderUpload,
@@ -37,33 +37,34 @@ const WordlistPractice = ({ user, userData, setUserData }) => {
   };
 
   const randomizeArrayIndex = (arr) => {
-    const indexArray = arr.map((_, index) => index);
+    const indexArray = arr.map((_, index) => index); // Create an array of indices
 
     for (let i = indexArray.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
+      const j = Math.floor(Math.random() * (i + 1)); // Randomly swap elements
       [indexArray[i], indexArray[j]] = [indexArray[j], indexArray[i]];
     }
 
-    return indexArray;
+    return indexArray; // Return the randomized array of indices
   };
 
   const nextWord = async () => {
-    setLoading(true);
+    setLoading(true); // Set loading state to true
     try {
       if (currentIndex === order.length - 1) {
-        let currO = randomizeArrayIndex(wordlist.words);
-        setCurrentIndex(0);
-        setOrder(currO);
+        // Check if the current word is the last in the order
+        let currO = randomizeArrayIndex(wordlist.words); // Randomize the order again
+        setCurrentIndex(0); // Reset current index
+        setOrder(currO); // Set new order
         setUserData(
           await uploadWordlistPractice({
             orderUpload: currO,
             currentIndexUpload: 0,
           })
         );
-        alert("End of wordlist");
-        navigate(`/competition/${competitionCode}/wordlist/${wordlistId}`);
+        alert("End of wordlist"); // Alert user that the wordlist has ended
+        navigate(`/competition/${competitionCode}/wordlist/${wordlistId}`); // Navigate to the wordlist page
       } else {
-        setCurrentIndex(currentIndex + 1);
+        setCurrentIndex(currentIndex + 1); // Increment current index
         setUserData(
           await uploadWordlistPractice({
             orderUpload: order,
@@ -72,27 +73,28 @@ const WordlistPractice = ({ user, userData, setUserData }) => {
         );
       }
 
-      const wordId = wordlist.words[order[currentIndex + 1]];
+      const wordId = wordlist.words[order[currentIndex + 1]]; // Get the next word ID
 
-      const word = await getWord({ wordId });
+      const word = await getWord({ wordId }); // Fetch the next word
 
-      setCurrentWord(word);
+      setCurrentWord(word); // Set the current word
 
-      setUsersGuess("");
-      setIsIncorrect(false);
+      setUsersGuess(""); // Reset user's guess
+      setIsIncorrect(false); // Reset incorrect state
     } catch (err) {
       console.error("Error fetching next word", err);
       setError("Failed to fetch the next word. Please try again.");
     } finally {
-      setLoading(false);
+      setLoading(false); // Set loading state to false
     }
   };
 
   const checkWord = () => {
     if (usersGuess === currentWord.word) {
-      nextWord();
+      // Check if user's guess matches the current word
+      nextWord(); // Fetch the next word
     } else {
-      setIsIncorrect(true);
+      setIsIncorrect(true); // Set incorrect state to true
     }
   };
 
@@ -103,7 +105,7 @@ const WordlistPractice = ({ user, userData, setUserData }) => {
           competitionCode,
           wordlistId,
         });
-        setWordlist(innerWordlist);
+        setWordlist(innerWordlist); // Set the fetched wordlist
 
         let currIndex;
         let ord;
@@ -113,25 +115,25 @@ const WordlistPractice = ({ user, userData, setUserData }) => {
         if (userData.wordlistsStudyDepth) {
           userData.wordlistsStudyDepth.forEach((element, index) => {
             if (element.wordlistId === wordlistId) {
-              wordlistExistenceIndex = index;
+              wordlistExistenceIndex = index; // Find the index of the wordlist in user's data
             }
           });
         }
 
         if (wordlistExistenceIndex !== -1) {
           currIndex =
-            userData.wordlistsStudyDepth[wordlistExistenceIndex].currentIndex;
-          ord = userData.wordlistsStudyDepth[wordlistExistenceIndex].order;
+            userData.wordlistsStudyDepth[wordlistExistenceIndex].currentIndex; // Get the current index from user's data
+          ord = userData.wordlistsStudyDepth[wordlistExistenceIndex].order; // Get the order from user's data
           if (currIndex === ord.length - 1) {
-            currIndex = 0;
+            currIndex = 0; // Reset index if it is the last word
           }
-          setCurrentIndex(currIndex);
-          setOrder(ord);
+          setCurrentIndex(currIndex); // Set current index
+          setOrder(ord); // Set order
         } else {
-          currIndex = 0;
-          ord = randomizeArrayIndex(innerWordlist.words);
-          setCurrentIndex(currIndex);
-          setOrder(ord);
+          currIndex = 0; // Initialize current index
+          ord = randomizeArrayIndex(innerWordlist.words); // Randomize order
+          setCurrentIndex(currIndex); // Set current index
+          setOrder(ord); // Set order
           setUserData(
             await uploadWordlistPractice({
               orderUpload: ord,
@@ -140,16 +142,16 @@ const WordlistPractice = ({ user, userData, setUserData }) => {
           );
         }
 
-        const wordId = innerWordlist.words[ord[currIndex]];
-        const word = await getWord({ wordId });
+        const wordId = innerWordlist.words[ord[currIndex]]; // Get the word ID for the current index
+        const word = await getWord({ wordId }); // Fetch the word
 
-        setCurrentWord(word);
+        setCurrentWord(word); // Set the current word
       } catch (err) {
         console.error("Error fetching wordlist", err);
         setError("Failed to fetch wordlist. Please try again.");
       }
     };
-    fetchWordlist();
+    fetchWordlist(); // Fetch the wordlist on component mount
   }, []);
 
   useEffect(() => {
@@ -158,7 +160,7 @@ const WordlistPractice = ({ user, userData, setUserData }) => {
       currentWord &&
       currentIndex !== wordlist.words.length - 1
     ) {
-      nextWord();
+      nextWord(); // Fetch the next word if the current word has no audio
     }
   }, [currentWord]);
 

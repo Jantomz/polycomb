@@ -1,36 +1,37 @@
-// import mongoose as it is the component that allows schemas, MongoDB alone is schema-less
+// Import mongoose to define schemas, as MongoDB alone is schema-less
 const mongoose = require("mongoose");
 
-// initializing the mongoose schema object into our own object
+// Initialize the mongoose schema object
 const Schema = mongoose.Schema;
 
-// creating the schema object to model the properties of a workout, defining the schema that must be adhered to
+// Define the schema for the User model
 const userSchema = new Schema(
   {
     uid: {
       type: String,
-      required: true,
-      unique: true,
-      index: true, // Adding index to make it a primary key
+      required: true, // UID is required for each user
+      unique: true, // UID must be unique across all users
+      index: true, // Indexing UID for faster query performance
     },
     role: {
       type: String,
-      enum: ["admin", "user"],
-      required: true,
+      enum: ["admin", "user"], // Role can only be 'admin' or 'user'
+      required: true, // Role is required to determine user permissions
     },
-    competitions: [String],
+    competitions: [String], // Array of competition IDs the user is part of
     forms: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Form",
+      ref: "Form", // Reference to the Form model
     },
     wordlistsStudyDepth: {
       type: Array,
-      default: [],
+      default: [], // Default to an empty array if not provided
     },
   },
-  { timestamps: true }
+  { timestamps: true } // Automatically add createdAt and updatedAt timestamps
 );
 
-userSchema.index({ uid: 1 }, { unique: true }); // Ensuring uid is indexed and unique
+// Ensure UID is indexed and unique for efficient querying and data integrity
+userSchema.index({ uid: 1 }, { unique: true });
 
-module.exports = mongoose.model("User", userSchema);
+module.exports = mongoose.model("User", userSchema); // Export the User model

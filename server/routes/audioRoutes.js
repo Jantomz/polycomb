@@ -1,6 +1,6 @@
 const express = require("express");
 
-// importing the function controllers to manipulate db
+// Importing the function controllers to manipulate db
 const {
   uploadAudio,
   getAudios,
@@ -13,10 +13,9 @@ const crypto = require("crypto");
 const multer = require("multer");
 const { GridFsStorage } = require("multer-gridfs-storage");
 
-// Create storage engine
-
+// Create storage engine for GridFS
 const storage = new GridFsStorage({
-  url: process.env.MONGO_URI,
+  url: process.env.MONGO_URI, // MongoDB connection string from environment variables
   file: (req, file) => {
     return new Promise((resolve, reject) => {
       // Generating a random filename
@@ -25,10 +24,11 @@ const storage = new GridFsStorage({
           return reject(err); // Reject if there's an error generating the filename
         }
 
-        const filename = buf.toString("hex") + path.extname(file.originalname); // Use a unique filename
+        // Create a unique filename using random bytes and original file extension
+        const filename = buf.toString("hex") + path.extname(file.originalname);
         const fileInfo = {
           filename: filename,
-          bucketName: "audios", // You can specify the collection name here
+          bucketName: "audios", // Specify the collection name in GridFS
         };
 
         resolve(fileInfo); // Return file info to gridfs-storage
@@ -36,17 +36,20 @@ const storage = new GridFsStorage({
     });
   },
 });
-const upload = multer({ storage });
+const upload = multer({ storage }); // Initialize multer with GridFS storage
 
-const router = express.Router();
+const router = express.Router(); // Create a new router object
 
 // GET all files for a specific wordlist
-router.get("/wordlist/:wordlistId", getAudios);
+router.get("/wordlist/:wordlistId", getAudios); // Route to get all audios for a wordlist
 
-router.post("/", upload.single("audio"), uploadAudio);
+// POST route to upload a single audio file
+router.post("/", upload.single("audio"), uploadAudio); // Middleware to handle file upload
 
-router.get("/:id", getAudioStream);
+// GET route to stream a specific audio file by ID
+router.get("/:id", getAudioStream); // Route to stream audio
 
-router.delete("/:id", deleteAudio);
+// DELETE route to remove a specific audio file by ID
+router.delete("/:id", deleteAudio); // Route to delete audio
 
-module.exports = router;
+module.exports = router; // Export the router to be used in other parts of the application

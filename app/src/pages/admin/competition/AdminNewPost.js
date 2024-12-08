@@ -3,31 +3,31 @@ import useApi from "../../../hooks/useApi.js";
 import { useNavigate, useParams } from "react-router-dom";
 
 const AdminNewPost = ({ user }) => {
-  const { createPost } = useApi();
-  const { code: competitionCode } = useParams();
+  const { createPost } = useApi(); // Custom hook to interact with API
+  const { code: competitionCode } = useParams(); // Get competition code from URL parameters
   const [formData, setFormData] = useState({
     title: "",
-    competitionCode: competitionCode,
+    competitionCode: competitionCode, // Initialize with competition code from URL
     description: "",
     tags: "",
-    creatorId: user.uid,
-    content: [""],
-    images: [""],
+    creatorId: user.uid, // Set creator ID from user prop
+    content: [""], // Initialize content with one empty string
+    images: [""], // Initialize images with one empty string
   });
 
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Hook to programmatically navigate
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value,
+      [name]: value, // Update formData state with new value
     });
   };
 
   const handleContentChange = (index, value) => {
     const newContent = [...formData.content];
-    newContent[index] = value;
+    newContent[index] = value; // Update specific content block
     setFormData({
       ...formData,
       content: newContent,
@@ -36,7 +36,7 @@ const AdminNewPost = ({ user }) => {
 
   const handleImageChange = (index, value) => {
     const newImages = [...formData.images];
-    newImages[index] = value;
+    newImages[index] = value; // Update specific image URL
     setFormData({
       ...formData,
       images: newImages,
@@ -46,19 +46,19 @@ const AdminNewPost = ({ user }) => {
   const addContentBlock = () => {
     setFormData({
       ...formData,
-      content: [...formData.content, ""],
+      content: [...formData.content, ""], // Add new empty content block
     });
   };
 
   const addImageBlock = () => {
     setFormData({
       ...formData,
-      images: [...formData.images, ""],
+      images: [...formData.images, ""], // Add new empty image block
     });
   };
 
   const deleteContentBlock = (index) => {
-    const newContent = formData.content.filter((_, i) => i !== index);
+    const newContent = formData.content.filter((_, i) => i !== index); // Remove specific content block
     setFormData({
       ...formData,
       content: newContent,
@@ -66,7 +66,7 @@ const AdminNewPost = ({ user }) => {
   };
 
   const deleteImageBlock = (index) => {
-    const newImages = formData.images.filter((_, i) => i !== index);
+    const newImages = formData.images.filter((_, i) => i !== index); // Remove specific image block
     setFormData({
       ...formData,
       images: newImages,
@@ -76,7 +76,7 @@ const AdminNewPost = ({ user }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const tags = formData.tags.split(",");
+      const tags = formData.tags.split(","); // Split tags by comma
       const res = await createPost({
         ...formData,
         tags,
@@ -93,7 +93,7 @@ const AdminNewPost = ({ user }) => {
           content: [""],
           images: [""],
         });
-        navigate(`/competition/${competitionCode}`);
+        navigate(`/competition/${competitionCode}`); // Navigate to competition page
       } else {
         alert("Error creating post");
       }

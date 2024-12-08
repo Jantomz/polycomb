@@ -1,36 +1,42 @@
-// import mongoose as it is the component that allows schemas, MongoDB alone is schema-less
+// Import mongoose to use its schema capabilities
 const mongoose = require("mongoose");
 
-// initializing the mongoose schema object into our own object
+// Initialize the mongoose schema object
 const Schema = mongoose.Schema;
 
-// creating the schema object to model the properties of a workout, defining the schema that must be adhered to
+// Define the schema for a wordlist
 const wordlistSchema = new Schema(
   {
+    // Title of the wordlist, must be a string and is required
     title: {
       type: String,
       required: true,
     },
+    // Description of the wordlist, must be a string and is required
     description: {
       type: String,
       required: true,
     },
+    // Unique code for competition, must be a string and is required
     competitionCode: {
       type: String,
       required: true,
     },
+    // ID of the creator, must be a string and is required
     creatorId: {
       type: String,
       required: true,
     },
+    // Array of word references, each must be an ObjectId referring to a Word document
     words: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Word",
+        ref: "Word", // Reference to the Word model
       },
     ],
   },
-  { timestamps: true }
+  { timestamps: true } // Automatically add createdAt and updatedAt timestamps
 );
 
+// Export the model to use it in other parts of the application
 module.exports = mongoose.model("Wordlist", wordlistSchema);

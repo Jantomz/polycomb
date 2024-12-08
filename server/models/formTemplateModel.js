@@ -1,30 +1,31 @@
-// import mongoose as it is the component that allows schemas, MongoDB alone is schema-less
+// Import mongoose to define schemas, as MongoDB itself is schema-less
 const mongoose = require("mongoose");
 
-// initializing the mongoose schema object into our own object
+// Initialize the mongoose schema object
 const Schema = mongoose.Schema;
 
-// creating the schema object to model the properties of a workout, defining the schema that must be adhered to
+// Define the schema for form templates
 const formTemplateSchema = new Schema(
   {
     title: {
-      type: String,
-      required: true,
+      type: String, // Title of the form template
+      required: true, // Title is mandatory
     },
     creatorId: {
-      type: String,
-      required: true,
+      type: String, // ID of the user who created the form
+      required: true, // Creator ID is mandatory
     },
     competitionCode: {
-      type: String,
-      required: true,
+      type: String, // Code for the associated competition
+      required: true, // Competition code is mandatory
     },
     fields: {
-      type: Array,
-      default: [],
+      type: Array, // Array to hold form fields
+      default: [], // Default to an empty array if no fields are provided
     },
   },
-  { timestamps: true }
+  { timestamps: true } // Automatically add createdAt and updatedAt timestamps
 );
 
+// Export the model to use it in other parts of the application
 module.exports = mongoose.model("FormTemplate", formTemplateSchema);

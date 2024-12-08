@@ -1,58 +1,58 @@
-import { useState, useEffect } from "react";
-import useApi from "../../hooks/useApi.js";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react"; // Importing React hooks
+import useApi from "../../hooks/useApi.js"; // Custom hook for API calls
+import { useNavigate } from "react-router-dom"; // Hook for navigation
 
 const CreateCompetition = ({ user, setUserData }) => {
-  const navigate = useNavigate();
-  const { createCompetition, addCompetition, createTemplate } = useApi();
-  const [errors, setErrors] = useState({});
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const navigate = useNavigate(); // Initialize navigation
+  const { createCompetition, addCompetition, createTemplate } = useApi(); // Destructure API functions
+  const [errors, setErrors] = useState({}); // State for form errors
+  const [startDate, setStartDate] = useState(""); // State for start date
+  const [endDate, setEndDate] = useState(""); // State for end date
 
   useEffect(() => {
     let newErrors = {};
     if (!startDate) {
-      newErrors.startDate = "Start date is required.";
+      newErrors.startDate = "Start date is required."; // Validate start date
     }
     if (!endDate) {
-      newErrors.endDate = "End date is required.";
+      newErrors.endDate = "End date is required."; // Validate end date
     }
     if (new Date(startDate) > new Date(endDate)) {
-      newErrors.endDate = "Start date cannot be after end date.";
+      newErrors.endDate = "Start date cannot be after end date."; // Check date logic
     }
-    setErrors(newErrors);
-  }, [startDate, endDate]);
+    setErrors(newErrors); // Update errors state
+  }, [startDate, endDate]); // Dependency array for useEffect
 
   const handleCreate = async (e) => {
-    e.preventDefault();
-    const title = e.target.title.value;
-    const description = e.target.description.value;
-    const startTemplate = e.target.startTemplate.checked;
+    e.preventDefault(); // Prevent form submission
+    const title = e.target.title.value; // Get title from form
+    const description = e.target.description.value; // Get description from form
+    const startTemplate = e.target.startTemplate.checked; // Get checkbox value
 
     let newErrors = {};
     if (!title) {
-      newErrors.title = "Title is required.";
+      newErrors.title = "Title is required."; // Validate title
     }
     if (!description) {
-      newErrors.description = "Description is required.";
+      newErrors.description = "Description is required."; // Validate description
     }
     if (!startDate) {
-      newErrors.startDate = "Start date is required.";
+      newErrors.startDate = "Start date is required."; // Validate start date
     }
     if (!endDate) {
-      newErrors.endDate = "End date is required.";
+      newErrors.endDate = "End date is required."; // Validate end date
     }
     if (new Date(startDate) > new Date(endDate)) {
-      newErrors.endDate = "Start date cannot be after end date.";
+      newErrors.endDate = "Start date cannot be after end date."; // Check date logic
     }
 
     if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
+      setErrors(newErrors); // Update errors state
+      return; // Exit if there are errors
     }
 
-    const code = Math.floor(10000 + Math.random() * 90000).toString();
-    const admins = [user.uid];
+    const code = Math.floor(10000 + Math.random() * 90000).toString(); // Generate random code
+    const admins = [user.uid]; // Set admins array
 
     try {
       const res = await createCompetition(
@@ -62,7 +62,7 @@ const CreateCompetition = ({ user, setUserData }) => {
         startDate,
         endDate,
         admins
-      );
+      ); // Call API to create competition
 
       if (startTemplate) {
         await createTemplate({
@@ -76,24 +76,24 @@ const CreateCompetition = ({ user, setUserData }) => {
             { name: "School", type: "text", required: true },
             { name: "Grade", type: "number", required: true },
           ],
-        });
+        }); // Create default template if checkbox is checked
       }
 
       if (res) {
         const res2 = await addCompetition({
           code: res.code,
           userId: user.uid,
-        });
+        }); // Add competition to user data
 
-        setUserData(res2);
+        setUserData(res2); // Update user data
       }
 
-      navigate("/");
+      navigate("/"); // Navigate to home page
     } catch (error) {
-      console.error("Error creating competition: ", error);
+      console.error("Error creating competition: ", error); // Log error
       setErrors({
         api: "An error occurred while creating the competition. Please try again later.",
-      });
+      }); // Set API error
     }
   };
 

@@ -1,6 +1,6 @@
 const express = require("express");
 
-// importing the function controllers to manipulate db
+// Importing the function controllers to manipulate db
 const {
   uploadFile,
   getFiles,
@@ -14,9 +14,8 @@ const multer = require("multer");
 const { GridFsStorage } = require("multer-gridfs-storage");
 
 // Create storage engine
-
 const storage = new GridFsStorage({
-  url: process.env.MONGO_URI,
+  url: process.env.MONGO_URI, // MongoDB connection string from environment variables
   file: (req, file) => {
     return new Promise((resolve, reject) => {
       // Generating a random filename
@@ -28,7 +27,7 @@ const storage = new GridFsStorage({
         const filename = buf.toString("hex") + path.extname(file.originalname); // Use a unique filename
         const fileInfo = {
           filename: filename,
-          bucketName: "uploads", // You can specify the collection name here
+          bucketName: "uploads", // Specify the collection name in GridFS
         };
 
         resolve(fileInfo); // Return file info to gridfs-storage
@@ -36,17 +35,17 @@ const storage = new GridFsStorage({
     });
   },
 });
-const upload = multer({ storage });
+const upload = multer({ storage }); // Initialize multer with GridFS storage
 
-const router = express.Router();
+const router = express.Router(); // Create a new router object
 
-// GET all files for a specific competitioncode
-router.get("/competition/:competitionCode", getFiles);
+// GET all files for a specific competition code
+router.get("/competition/:competitionCode", getFiles); // Route to get files by competition code
 
-router.post("/", upload.single("file"), uploadFile);
+router.post("/", upload.single("file"), uploadFile); // Route to upload a single file
 
-router.get("/:id", getFileStream);
+router.get("/:id", getFileStream); // Route to get a file stream by ID
 
-router.delete("/:id", deleteFile);
+router.delete("/:id", deleteFile); // Route to delete a file by ID
 
-module.exports = router;
+module.exports = router; // Export the router
