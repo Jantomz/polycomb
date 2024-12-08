@@ -1,131 +1,139 @@
-// this file holds functions that hold the logic for manipulating the database, as we don't want to clutter the router file
-
-// imports the workout collection model
 const Wordlist = require("../models/wordlistModel");
-
 const Word = require("../models/wordModel");
-
 const mongoose = require("mongoose");
 
 const getWordlists = async (req, res) => {
-  const competitionCode = req.params.competitionCode;
-  const wordlists = await Wordlist.find({
-    competitionCode: competitionCode,
-  }).sort({ createdAt: -1 }); // sorting in descending order
-  res.status(200).json(wordlists);
+  try {
+    const competitionCode = req.params.competitionCode;
+    const wordlists = await Wordlist.find({ competitionCode }).sort({
+      createdAt: -1,
+    });
+    res.status(200).json(wordlists);
+  } catch (error) {
+    console.error("Error fetching wordlists:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
 const getWordlist = async (req, res) => {
-  const { competitionCode, wordlistId } = req.params;
-
-  console.log("Getting wordlist: ", competitionCode, wordlistId);
-
-  const wordlist = await Wordlist.findOne({
-    competitionCode: competitionCode,
-    _id: wordlistId,
-  });
-
-  console.log("Wordlist: ", wordlist);
-
-  if (!wordlist) {
-    return res.status(404).json({ error: "Wordlist not found" });
+  try {
+    const { competitionCode, wordlistId } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(wordlistId)) {
+      return res.status(400).json({ error: "Invalid wordlist ID" });
+    }
+    const wordlist = await Wordlist.findOne({
+      competitionCode,
+      _id: wordlistId,
+    });
+    if (!wordlist) {
+      return res.status(404).json({ error: "Wordlist not found" });
+    }
+    res.status(200).json(wordlist);
+  } catch (error) {
+    console.error("Error fetching wordlist:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
-
-  res.status(200).json(wordlist);
 };
 
 const createWordlist = async (req, res) => {
-  if (!req.body || Object.keys(req.body).length === 0) {
-    return res.status(400).json({ error: "Request body is missing or empty" });
+  try {
+    if (!req.body || Object.keys(req.body).length === 0) {
+      return res
+        .status(400)
+        .json({ error: "Request body is missing or empty" });
+    }
+    const words = req.body.words;
+    if (!words || words.length === 0) {
+      return res.status(400).json({ error: "Words array is missing or empty" });
+    }
+    const wordIds = [];
+    for (let i = 0; i < words.length; i++) {
+      const word = new Word(words[i]);
+      await word.save();
+      wordIds.push(word._id);
+    }
+    req.body.words = wordIds;
+    const wordlist = new Wordlist(req.body);
+    await wordlist.save();
+    res.status(201).json(wordlist);
+  } catch (error) {
+    console.error("Error creating wordlist:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
-
-  const words = req.body.words;
-
-  if (!words || words.length === 0) {
-    return res.status(400).json({ error: "Words array is missing or empty" });
-  }
-
-  const wordIds = [];
-
-  for (let i = 0; i < words.length; i++) {
-    const word = new Word(words[i]);
-    await word.save();
-    wordIds.push(word._id);
-  }
-
-  req.body.words = wordIds;
-
-  console.log("Creating wordlist: ", req.body);
-
-  const wordlist = new Wordlist(req.body);
-  await wordlist.save();
-  res.status(201).json(wordlist);
 };
 
 const getWord = async (req, res) => {
-  const { wordId } = req.params;
-
-  const word = await Word.findById(wordId);
-
-  if (!word) {
-    return res.status(404).json({ error: "Word not found" });
+  try {
+    const { wordId } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(wordId)) {
+      return res.status(400).json({ error: "Invalid word ID" });
+    }
+    const word = await Word.findById(wordId);
+    if (!word) {
+      return res.status(404).json({ error: "Word not found" });
+    }
+    res.status(200).json(word);
+  } catch (error) {
+    console.error("Error fetching word:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
-
-  res.status(200).json(word);
 };
 
 const updateWord = async (req, res) => {
-  const { wordId } = req.params;
-
-  const word = await Word.findById(wordId);
-
-  if (!word) {
-    return res.status(404).json({ error: "Word not found" });
+  try {
+    const { wordId } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(wordId)) {
+      return res.status(400).json({ error: "Invalid word ID" });
+    }
+    const word = await Word.findById(wordId);
+    if (!word) {
+      return res.status(404).json({ error: "Word not found" });
+    }
+    const updatedWord = await Word.findByIdAndUpdate(wordId, req.body, {
+      new: true,
+    });
+    res.status(200).json(updatedWord);
+  } catch (error) {
+    console.error("Error updating word:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
-
-  const updatedWord = await Word.findByIdAndUpdate(wordId, req.body, {
-    new: true,
-  });
-
-  res.status(200).json(updatedWord);
 };
 
 const deleteWord = async (req, res) => {
-  const { wordId } = req.params;
-
-  console.log("Deleting word: ", wordId);
-
-  if (!mongoose.Types.ObjectId.isValid(wordId)) {
-    return res.status(404).json({ error: "Word not found" });
+  try {
+    const { wordId } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(wordId)) {
+      return res.status(400).json({ error: "Invalid word ID" });
+    }
+    await Word.findByIdAndDelete(wordId);
+    await Wordlist.findOneAndUpdate(
+      { words: wordId },
+      { $pull: { words: wordId } }
+    );
+    res.status(200).json({ message: "Word deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting word:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
-
-  await Word.findByIdAndDelete(wordId);
-
-  await Wordlist.findOneAndUpdate(
-    { words: wordId },
-    { $pull: { words: wordId } }
-  );
-
-  res.status(200).json({ message: "Word deleted successfully" });
 };
 
 const deleteWordlist = async (req, res) => {
-  const { wordlistId } = req.params;
-
-  console.log("Deleting wordlist: ", wordlistId);
-
-  if (!mongoose.Types.ObjectId.isValid(wordlistId)) {
-    return res.status(404).json({ error: "Wordlist not found" });
+  try {
+    const { wordlistId } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(wordlistId)) {
+      return res.status(400).json({ error: "Invalid wordlist ID" });
+    }
+    await Wordlist.findByIdAndDelete(wordlistId);
+    await Word.deleteMany({ wordlistId });
+    res
+      .status(200)
+      .json({ message: "Wordlist and words deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting wordlist:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
-
-  await Wordlist.findByIdAndDelete(wordlistId);
-
-  await Word.deleteMany({ wordlistId: wordlistId });
-
-  res.status(200).json({ message: "Wordlist and words deleted successfully" });
 };
 
-// exporting all the function controllers
 module.exports = {
   getWordlists,
   getWordlist,

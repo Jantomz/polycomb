@@ -49,29 +49,29 @@ const WordlistDifficulty = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center w-max">
-      <div className="border-2 border-yellow-300 p-6 rounded-lg shadow-md">
-        <h1 className="text-2xl font-bold mb-4 text-yellow-700">
-          Wordlist Difficulty Calculator
+    <div className="flex flex-col items-center justify-center w-full px-4">
+      <div className="border-2 border-yellow-300 p-6 rounded-lg shadow-md w-full max-w-4xl">
+        <h1 className="text-2xl font-bold mb-4 text-yellow-700 text-center">
+          Wordlist Difficulty Calc
         </h1>
-        <div className="flex gap-4 justify-center">
+        <div className="flex flex-col md:flex-row gap-4 justify-center">
           <input
-            className="border-2 border-yellow-300 p-2 rounded-lg mb-4 w-1/4"
+            className="border-2 border-yellow-300 p-2 rounded-lg mb-4 md:mb-0 w-full md:w-1/2"
             type="file"
             accept=".csv"
             onChange={handleFileChange}
           />
           <button
-            className="bg-yellow-500 text-white py-2 px-4 rounded-lg hover:bg-yellow-600 transition duration-300 mb-4"
+            className="bg-yellow-500 text-white py-2 px-4 rounded-lg hover:bg-yellow-600 transition duration-300 w-full md:w-auto"
             onClick={handleUpload}
           >
             Upload CSV
           </button>
         </div>
-        {error && <p className="text-red-500">{error}</p>}
+        {error && <p className="text-red-500 mt-4">{error}</p>}
         {words.length > 0 && (
-          <div className="w-1/2 h-80 overflow-y-auto mx-auto">
-            <h3 className="text-xl font-semibold mb-2">Preview</h3>
+          <div className="w-full h-80 overflow-y-auto mt-4">
+            <h3 className="text-xl font-semibold mb-2 text-center">Preview</h3>
             {words.map((word, index) => (
               <div key={index} className="mb-4 p-4 border rounded-lg shadow-sm">
                 <h3 className="text-lg font-bold">{word.word}</h3>
@@ -92,7 +92,7 @@ const WordlistDifficulty = () => {
         )}
         {words[words.length - 1]?.freq && (
           <button
-            className="bg-yellow-500 text-white py-2 px-4 rounded-lg hover:bg-yellow-600 transition duration-300"
+            className="bg-yellow-500 text-white py-2 px-4 rounded-lg hover:bg-yellow-600 transition duration-300 mt-4 w-full md:w-auto"
             onClick={() => {
               try {
                 const csvHeader = [

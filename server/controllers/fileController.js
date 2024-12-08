@@ -1,103 +1,108 @@
-// this file holds functions that hold the logic for manipulating the database, as we don't want to clutter the router file
-
-// TODO: Add authentication through JWT or something to these routes
 const mongoose = require("mongoose");
-
 const File = require("../models/fileModel");
-
 const { GridFSBucket } = require("mongodb");
 
 const uploadFile = async (req, res) => {
-  console.log("Uploading file: ", req.file);
-  if (!req.file) {
-    return res.status(400).json({ message: "No file uploaded" });
+  try {
+    console.log("Uploading file: ", req.file);
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    const { originalname: filename, id: fileId, mimetype: fileType } = req.file;
+    const { creatorId, competitionCode } = req.body;
+
+    if (!creatorId || !competitionCode) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    console.log(
+      "Creating file: ",
+      filename,
+      creatorId,
+      competitionCode,
+      fileId
+    );
+
+    const file = new File({
+      filename,
+      creatorId,
+      competitionCode,
+      fileId,
+      fileType,
+    });
+
+    await file.save();
+
+    res.status(200).json({
+      message: "File uploaded successfully",
+      file: req.file,
+      dbFile: file,
+    });
+  } catch (error) {
+    console.error("Error uploading file:", error);
+    res
+      .status(500)
+      .json({ message: "An error occurred while uploading the file" });
   }
-
-  // verify all these things are here
-  const filename = req.file.originalname;
-
-  const creatorId = req.body.creatorId;
-
-  const competitionCode = req.body.competitionCode;
-
-  const fileId = req.file.id;
-
-  const fileType = req.file.mimetype;
-
-  console.log("Creating file: ", filename, creatorId, competitionCode, fileId);
-
-  const file = new File({
-    filename,
-    creatorId,
-    competitionCode,
-    fileId,
-    fileType,
-  });
-
-  await file.save();
-
-  // Assuming you need to return the file info after upload
-  res.status(200).json({
-    message: "File uploaded successfully",
-    file: req.file, // You can access the file object here
-    dbFile: file, // You can access the file object here
-  });
 };
 
 const getFiles = async (req, res) => {
-  console.log("Getting all files");
+  try {
+    console.log("Getting all files");
 
-  const competitionCode = req.params.competitionCode;
+    const { competitionCode } = req.params;
 
-  if (!competitionCode) {
-    return res.status(400).json({ message: "Competition code is required" });
+    if (!competitionCode) {
+      return res.status(400).json({ message: "Competition code is required" });
+    }
+
+    const files = await File.find({ competitionCode });
+    res.status(200).json(files);
+  } catch (error) {
+    console.error("Error getting files:", error);
+    res
+      .status(500)
+      .json({ message: "An error occurred while retrieving files" });
   }
-
-  const files = await File.find({ competitionCode });
-  res.status(200).json(files);
 };
 
 const getFileStream = async (req, res) => {
-  const fileId = req.params.id; // The file ID from the URL
+  const { id: fileId } = req.params;
 
   try {
-    // Assuming req.gfs is properly initialized and connected
     const files = await req.gfs.files.find().toArray();
-
     const file = files.find((file) => file._id.toString() === fileId);
 
     if (!file) {
       return res.status(404).json({ message: "File not found" });
     }
 
-    // Check if the file is a PDF
     if (file.contentType !== "application/pdf") {
       return res.status(400).json({ message: "File is not a PDF" });
     }
 
     console.log("Getting file: ", file);
 
-    // Get the file stream from GridFS
     const bucket = new GridFSBucket(mongoose.connection.db, {
-      bucketName: "uploads", // replace with your bucket name
+      bucketName: "uploads",
     });
     const readStream = bucket.openDownloadStreamByName(file.filename);
 
     console.log("Streaming file: ", file.filename);
 
-    // Set the correct content type for the response
     res.set("Content-Type", file.contentType);
 
-    // Handle errors on the readStream
     readStream.on("error", (err) => {
       console.error("Error streaming file:", err);
-      return res.status(404).json({ message: "File not found" });
+      return res
+        .status(500)
+        .json({ message: "An error occurred while streaming the file" });
     });
 
-    // Pipe the file stream to the response
     readStream.pipe(res);
-  } catch (err) {
-    console.error("Error fetching file:", err);
+  } catch (error) {
+    console.error("Error fetching file:", error);
     res
       .status(500)
       .json({ message: "An error occurred while retrieving the file" });
@@ -105,26 +110,48 @@ const getFileStream = async (req, res) => {
 };
 
 const deleteFile = async (req, res) => {
-  console.log("Deleting file: ", req.params.id);
-  const bucket = new GridFSBucket(mongoose.connection.db, {
-    bucketName: "uploads", // replace with your bucket name
-  });
-
-  bucket.delete(new mongoose.Types.ObjectId(req.params.id), async (err) => {
-    if (err) {
-      return res.status(404).json({ err: err });
-    }
-  });
-
-  console.log("Deleted file 1: ", req.params.id);
+  const { id: fileId } = req.params;
 
   try {
-    const fileRes = await File.findOneAndDelete({ fileId: req.params.id });
-    console.log("Deleted file 2: ", req.params.id);
-    res.status(200).json({ message: "File deleted successfully" });
-  } catch (err) {
-    console.error("Error deleting file:", err);
-    return res.status(404).json({ err: err });
+    console.log("Deleting file: ", fileId);
+    const bucket = new GridFSBucket(mongoose.connection.db, {
+      bucketName: "uploads",
+    });
+
+    bucket.delete(new mongoose.Types.ObjectId(fileId), async (err) => {
+      if (err) {
+        console.error("Error deleting file from GridFS:", err);
+        return res
+          .status(500)
+          .json({
+            message: "An error occurred while deleting the file from GridFS",
+          });
+      }
+
+      try {
+        const fileRes = await File.findOneAndDelete({ fileId });
+        if (!fileRes) {
+          return res
+            .status(404)
+            .json({ message: "File not found in database" });
+        }
+        console.log("Deleted file: ", fileId);
+        res.status(200).json({ message: "File deleted successfully" });
+      } catch (error) {
+        console.error("Error deleting file from database:", error);
+        res
+          .status(500)
+          .json({
+            message:
+              "An error occurred while deleting the file from the database",
+          });
+      }
+    });
+  } catch (error) {
+    console.error("Error deleting file:", error);
+    res
+      .status(500)
+      .json({ message: "An error occurred while deleting the file" });
   }
 };
 

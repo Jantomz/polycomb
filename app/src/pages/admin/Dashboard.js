@@ -28,12 +28,12 @@ const Dashboard = ({ user, userData }) => {
   }, [userData]);
 
   return (
-    <div className="p-8 min-h-screen">
+    <div className="p-4 md:p-8 min-h-screen">
       <section className="mb-12">
-        <h1 className="text-6xl font-bold mb-12 text-center text-gray-900">
+        <h1 className="text-4xl md:text-6xl font-bold mb-8 md:mb-12 text-center text-gray-900">
           Admin Dashboard
         </h1>
-        <h2 className="text-3xl font-semibold mb-8 text-gray-800">
+        <h2 className="text-2xl md:text-3xl font-semibold mb-6 md:mb-8 text-gray-800">
           Your Competitions
         </h2>
         {error && <div className="text-red-500 text-center mb-4">{error}</div>}
@@ -44,9 +44,9 @@ const Dashboard = ({ user, userData }) => {
                 navigate(`/competition/${competition.code}`);
               }}
               key={competition._id}
-              className="border-4 border-yellow-200 p-4 rounded-lg bg-yellow-300 hover:bg-yellow-400 transition duration-300 ease-in-out transform hover:scale-105"
+              className="border-4 border-yellow-200 p-4 rounded-lg bg-yellow-300 hover:bg-yellow-400 transition duration-300 ease-in-out transform hover:scale-105 w-full sm:w-1/2 md:w-1/3 lg:w-1/4"
             >
-              <h3 className="text-2xl font-semibold text-black mb-2">
+              <h3 className="text-xl md:text-2xl font-semibold text-black mb-2">
                 {competition.title}
               </h3>
               <p className="text-sm font-normal text-gray-800 mb-1">
@@ -72,7 +72,7 @@ const Dashboard = ({ user, userData }) => {
         </div>
       </section>
 
-      <h2 className="text-3xl font-semibold mb-4 text-gray-800">
+      <h2 className="text-2xl md:text-3xl font-semibold mb-4 text-gray-800">
         Wordlist Tools
       </h2>
       <section className="flex flex-col gap-4 justify-center items-center">

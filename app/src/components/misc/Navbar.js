@@ -4,14 +4,14 @@ import Logout from "../auth/Logout.js";
 const Navbar = ({ user, userData }) => {
   return (
     <nav className="w-screen bg-orange-300">
-      <ul className="flex justify-between items-center gap-4 p-4">
+      <ul className="flex flex-col md:flex-row justify-between items-center gap-4 p-4">
         {user && (
           <>
             <Link to="/" className="text-3xl font-bold">
               Polycomb
             </Link>
-            <div className="flex gap-3 items-center">
-              <h2 className="">
+            <div className="flex flex-col md:flex-row gap-3 items-center">
+              <h2 className="text-center md:text-left">
                 You are signed in as{" "}
                 <span className="font-bold">
                   {user.displayName || user.email}
@@ -21,12 +21,8 @@ const Navbar = ({ user, userData }) => {
                 <img
                   src={user.photoURL}
                   alt="profile"
-                  style={{
-                    borderRadius: "50%",
-                    width: "30px",
-                    height: "30px",
-                  }}
-                ></img>
+                  className="rounded-full w-8 h-8"
+                />
               )}
               <Logout />
             </div>
