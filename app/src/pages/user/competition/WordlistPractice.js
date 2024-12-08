@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import useApi from "../../../hooks/useApi.js";
 import { useEffect, useState } from "react";
 
@@ -8,10 +8,12 @@ const WordlistPractice = ({ user, userData, setUserData }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [order, setOrder] = useState([]);
   const [currentWord, setCurrentWord] = useState(null);
-
   const [wordlist, setWordlist] = useState(null);
-
   const [usersGuess, setUsersGuess] = useState("");
+  const [isIncorrect, setIsIncorrect] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
 
   const { getWordlist, setWordlistPractice, getWord } = useApi();
 
@@ -26,6 +28,7 @@ const WordlistPractice = ({ user, userData, setUserData }) => {
       currentIndex: currentIndexUpload,
     });
     console.log("Uploaded wordlist practice", res);
+    return res;
   };
 
   const randomizeArrayIndex = (arr) => {
@@ -42,12 +45,24 @@ const WordlistPractice = ({ user, userData, setUserData }) => {
   };
 
   const nextWord = async () => {
+    setLoading(true);
     if (currentIndex === order.length - 1) {
       console.log("End of wordlist");
+      let currO = randomizeArrayIndex(wordlist.words);
+      setCurrentIndex(0);
+      setOrder(currO);
+      setUserData(
+        await uploadWordlistPractice({
+          orderUpload: currO,
+          currentIndexUpload: 0,
+        })
+      );
+      alert("End of wordlist");
+      navigate(`/competition/${competitionCode}/wordlist/${wordlistId}`);
     } else {
       setCurrentIndex(currentIndex + 1);
       setUserData(
-        uploadWordlistPractice({
+        await uploadWordlistPractice({
           orderUpload: order,
           currentIndexUpload: currentIndex + 1,
         })
@@ -63,6 +78,9 @@ const WordlistPractice = ({ user, userData, setUserData }) => {
     console.log("Next word", word);
 
     setUsersGuess("");
+    setIsIncorrect(false);
+
+    setLoading(false);
 
     return word;
   };
@@ -75,6 +93,7 @@ const WordlistPractice = ({ user, userData, setUserData }) => {
       nextWord();
     } else {
       console.log("Incorrect");
+      setIsIncorrect(true);
     }
   };
 
@@ -95,11 +114,13 @@ const WordlistPractice = ({ user, userData, setUserData }) => {
 
       console.log("userData", userData);
 
-      userData.wordlistsStudyDepth.forEach((element, index) => {
-        if (element.wordlistId === wordlistId) {
-          wordlistExistenceIndex = index;
-        }
-      });
+      if (userData.wordlistsStudyDepth) {
+        userData.wordlistsStudyDepth.forEach((element, index) => {
+          if (element.wordlistId === wordlistId) {
+            wordlistExistenceIndex = index;
+          }
+        });
+      }
 
       if (wordlistExistenceIndex !== -1) {
         currIndex =
@@ -154,28 +175,58 @@ const WordlistPractice = ({ user, userData, setUserData }) => {
   }, [currentWord]);
 
   return (
-    <div>
-      <h1>WordlistPractice</h1>
-      {currentWord && currentWord.audioId && (
-        <>
-          <audio controls>
+    <div className="bg-yellow-100 min-h-screen flex flex-col items-center justify-center p-4">
+      <h1 className="text-4xl font-bold text-yellow-800 mb-6">
+        Wordlist Practice
+      </h1>
+      {currentWord && currentWord.audioId && !loading && (
+        <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+          <audio controls autoPlay className="w-full mb-4">
             <source
               src={`http://localhost:8080/api/audio/${currentWord.audioId}`}
               type="audio/wav"
             />
           </audio>
-          <p>{currentWord.definition}</p>
-          <p>{currentWord.partOfSpeech}</p>
-          <p>{currentWord.etymology}</p>
-          <p>{currentWord.sentence}</p>
-          <p>{currentWord.notes}</p>
+          <p className="text-lg text-yellow-700 mb-2">
+            <strong>Definition:</strong> {currentWord.definition}
+          </p>
+          <p className="text-lg text-yellow-700 mb-2">
+            <strong>Part of Speech:</strong> {currentWord.partOfSpeech}
+          </p>
+          <p className="text-lg text-yellow-700 mb-2">
+            <strong>Etymology:</strong> {currentWord.etymology}
+          </p>
+
+          <p className="text-lg text-yellow-700 mb-4">
+            <strong>Notes:</strong> {currentWord.notes || "None"}
+          </p>
           <input
+            autoComplete="off"
             type="text"
             value={usersGuess}
-            onChange={(e) => setUsersGuess(e.target.value)}
+            autoFocus
+            onChange={(e) => {
+              setUsersGuess(e.target.value);
+              setIsIncorrect(false);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                checkWord();
+              }
+            }}
+            className="w-full p-2 border border-yellow-300 rounded mb-4"
+            placeholder="Enter your spelling"
           />
-          <button onClick={checkWord}>Submit</button>
-        </>
+          {isIncorrect && (
+            <p className="text-red-500 mb-4">Incorrect, please try again.</p>
+          )}
+          <button
+            onClick={checkWord}
+            className="w-full bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600"
+          >
+            Submit
+          </button>
+        </div>
       )}
     </div>
   );

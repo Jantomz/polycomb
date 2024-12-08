@@ -11,7 +11,14 @@ const Logout = () => {
     }
   };
 
-  return <button onClick={handleLogout}>Log Out</button>;
+  return (
+    <button
+      onClick={handleLogout}
+      className="py-2 px-4 hover:text-orange-900 font-bold"
+    >
+      Log Out
+    </button>
+  );
 };
 
 export default Logout;

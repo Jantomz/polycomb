@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import useApi from "../../../hooks/useApi.js";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import React, { useRef } from "react";
+import React from "react";
 
 const ViewWordlist = ({ user, userData }) => {
   const { getWordlist, getWord } = useApi();
@@ -44,45 +44,54 @@ const ViewWordlist = ({ user, userData }) => {
   };
 
   return (
-    <div>
-      <h1>Edit Wordlist</h1>
-      <Link to={`/competition/${code}/wordlist/${wordlistId}/practice`}>
+    <div className="p-6 bg-yellow-50 min-h-screen">
+      <h1 className="text-4xl font-bold text-yellow-700 mb-4">Edit Wordlist</h1>
+      <Link
+        to={`/competition/${code}/wordlist/${wordlistId}/practice`}
+        className="text-yellow-600 hover:text-yellow-800 underline mb-4 inline-block"
+      >
         Practice
       </Link>
       {wordlist && (
         <>
-          <h2>{wordlist.title}</h2>
-          <p>{wordlist.description}</p>
+          <h2 className="text-2xl font-semibold text-yellow-800 mb-2">
+            {wordlist.title}
+          </h2>
+          <p className="text-yellow-700 mb-4">{wordlist.description}</p>
           {words.map((word) => (
             <div
               key={word._id}
-              style={{
-                border: "1px solid black",
-              }}
+              className="border border-yellow-300 p-4 mb-4 rounded-lg bg-white shadow-md"
             >
-              <h3>{word.word}</h3>
-              <p>{word.pronunciation}</p>
-              <p>{word.partOfSpeech}</p>
-              <p>{word.definition}</p>
-              <p>{word.sentence}</p>
-              <p>{word.notes}</p>
-
+              <h3 className="text-xl font-bold text-yellow-800">{word.word}</h3>
               {word.audioId && (
-                <audio controls>
+                <audio controls className="mt-2 mx-auto">
                   <source
                     src={`http://localhost:8080/api/audio/${word.audioId}`}
                     type="audio/mpeg"
                   />
                 </audio>
               )}
+
+              <p className="text-yellow-700">{word.pronunciation}</p>
+              <p className="text-yellow-700">{word.partOfSpeech}</p>
+              <p className="text-yellow-700">{word.definition}</p>
+              <p className="text-yellow-700">{word.etymology}</p>
+              <p className="text-yellow-700">{word.sentence}</p>
+              <p className="text-yellow-700">{word.notes}</p>
             </div>
           ))}
-          <div>
+          <div className="flex justify-center mt-4">
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
               <button
                 key={page}
                 onClick={() => fetchWords(page)}
                 disabled={page === currentPage}
+                className={`px-4 py-2 mx-1 rounded ${
+                  page === currentPage
+                    ? "bg-yellow-600 text-white"
+                    : "bg-yellow-200 text-yellow-800 hover:bg-yellow-300"
+                }`}
               >
                 {page}
               </button>

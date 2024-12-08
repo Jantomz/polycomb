@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import useApi from "../../../hooks/useApi.js";
 
 const AdminEditTimeline = () => {
@@ -7,6 +7,8 @@ const AdminEditTimeline = () => {
   const { updateTimeline, getCompetition } = useApi();
   const { code } = useParams();
   const [competition, setCompetition] = useState(null);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCompetition = async () => {
@@ -26,12 +28,8 @@ const AdminEditTimeline = () => {
       {
         name: "",
         description: "",
-        startDate: competition?.startDate
-          ? new Date(competition.startDate).toISOString().split("T")[0]
-          : "",
-        endDate: competition?.startDate
-          ? new Date(competition.startDate).toISOString().split("T")[0]
-          : "",
+        startDate: competition?.startDate || "",
+        endDate: competition?.startDate || "",
       },
     ]);
   };
@@ -50,55 +48,96 @@ const AdminEditTimeline = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log(events);
-    updateTimeline({ code, timeline: events });
+    const submitTimeline = async () => {
+      await updateTimeline({ code, timeline: events });
+      navigate(`/competition/${code}`);
+    };
+    submitTimeline();
   };
 
   return (
-    <div>
-      <h1>Edit Timeline for {competition?.title}</h1>
-      <form onSubmit={(e) => handleSubmit(e)}>
+    <div className="p-6 bg-white rounded-lg shadow-md">
+      <h1 className="text-2xl font-bold mb-4">
+        Edit Timeline for {competition?.title}
+      </h1>
+      <form onSubmit={(e) => handleSubmit(e)} className="space-y-6">
         {events.map((event, index) => (
-          <div key={index}>
-            <label htmlFor={`event-${index}-name`}>Event {index + 1}</label>
+          <div
+            key={index}
+            className="bg-white p-4 rounded-lg shadow-md space-y-4"
+          >
+            <label
+              htmlFor={`event-${index}-name`}
+              className="block text-yellow-700 font-semibold"
+            >
+              Event {index + 1}
+            </label>
             <input
+              autoComplete="off"
               type="text"
               id={`event-${index}-name`}
               value={event.name}
               onChange={(e) => handleEventChange(index, "name", e.target.value)}
+              className="w-full p-2 border border-yellow-300 rounded"
+              placeholder="Event Name"
+              required
             />
             <input
+              autoComplete="off"
               type="text"
               id={`event-${index}-description`}
               value={event.description}
               onChange={(e) =>
                 handleEventChange(index, "description", e.target.value)
               }
+              className="w-full p-2 border border-yellow-300 rounded"
+              placeholder="Event Description"
+              required
             />
             <input
+              autoComplete="off"
               type="date"
               id={`event-${index}-startDate`}
               value={event.startDate}
               onChange={(e) =>
                 handleEventChange(index, "startDate", e.target.value)
               }
+              className="w-full p-2 border border-yellow-300 rounded"
             />
             <input
+              autoComplete="off"
               type="date"
               id={`event-${index}-endDate`}
               value={event.endDate}
               onChange={(e) =>
                 handleEventChange(index, "endDate", e.target.value)
               }
+              className="w-full p-2 border border-yellow-300 rounded"
             />
-            <button onClick={() => removeEvent(index)} type="button">
+            <button
+              onClick={() => removeEvent(index)}
+              type="button"
+              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+            >
               Remove Event
             </button>
           </div>
         ))}
-        <button onClick={addEvent} type="button">
-          Add Event
-        </button>
-        <button type="submit">Save Timeline</button>
+        <div className="flex gap-4 m-auto w-max">
+          <button
+            onClick={addEvent}
+            type="button"
+            className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
+          >
+            Add Event
+          </button>
+          <button
+            type="submit"
+            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+          >
+            Save Schedule
+          </button>
+        </div>
       </form>
     </div>
   );

@@ -23,7 +23,6 @@ const CompetitionDash = ({ user }) => {
   useEffect(() => {
     const fetchCompetition = async () => {
       const competition = await getCompetition({ code: code });
-      console.log(competition);
       setCompetition(competition);
     };
     fetchCompetition();
@@ -32,9 +31,9 @@ const CompetitionDash = ({ user }) => {
       const templates = await getCompetitionTemplates({
         competitionCode: code,
       });
-      console.log(templates);
       setTemplates(templates);
     };
+
     fetchTemplates();
 
     const fetchForms = async () => {
@@ -42,147 +41,145 @@ const CompetitionDash = ({ user }) => {
         competitionCode: code,
         userId: user.uid,
       });
-      console.log(forms);
       setForms(forms);
     };
     fetchForms();
 
-    const fetchFiles = async () => {
-      console.log("Fetching files");
-      const files = await getFiles({ competitionCode: code });
-      console.log("files", files);
-      setFiles(files);
-    };
-
-    fetchFiles();
-
     const fetchPosts = async () => {
       const posts = await getPosts({ competitionCode: code });
-      console.log(posts);
       setPosts(posts);
     };
     fetchPosts();
 
     const fetchWordlists = async () => {
       const wordlists = await getWordlists({ competitionCode: code });
-      console.log(wordlists);
       setWordlists(wordlists);
     };
-
     fetchWordlists();
   }, []);
 
   return (
-    <div>
-      <h1>Competition Dashboard</h1>
-      <h2>{code}</h2>
-      {competition && (
-        <>
-          <div>
-            <h3>{competition.title}</h3>
-            <p>{competition.description}</p>
-            <p>{new Date(competition.startDate).toLocaleDateString()}</p>
-            <p>{new Date(competition.endDate).toLocaleDateString()}</p>
-          </div>
-          <div>
-            <h1>Schedule</h1>
-            {competition.schedule.map((event) => (
-              <div key={event.name}>
-                <h3>{event.name}</h3>
-                <p>{event.description}</p>
-                <p>{new Date(event.startDate).toLocaleDateString()}</p>
-                <p>{new Date(event.endDate).toLocaleDateString()}</p>
-                <p>{event.startTime}</p>
-                <p>{event.endTime}</p>
-              </div>
-            ))}
-          </div>
-          <div>
-            <h1>Forms</h1>
-            {templates?.map((template) =>
-              !forms.find((form) => form.templateId === template._id) ? (
+    <div className="bg-yellow-50 text-gray-800">
+      <div className="flex">
+        <aside className="w-64 bg-yellow-200 p-4">
+          <h1 className="text-2xl font-bold mb-4">General Actions</h1>
+          <nav className="space-y-2 mb-6">
+            <Link
+              to={`/competition/${code}/posts`}
+              className="block py-2 px-4 bg-yellow-300 rounded hover:bg-yellow-400"
+            >
+              View Posts
+            </Link>
+            <Link
+              to={`/competition/${code}/schedule`}
+              className="block py-2 px-4 bg-yellow-300 rounded hover:bg-yellow-400"
+            >
+              View Schedule
+            </Link>
+            <Link
+              to={`/competition/${code}/forms`}
+              className="block py-2 px-4 bg-yellow-300 rounded hover:bg-yellow-400"
+            >
+              View Forms
+            </Link>
+
+            <Link
+              to={`/competition/${code}/files`}
+              className="block py-2 px-4 bg-yellow-300 rounded hover:bg-yellow-400"
+            >
+              View Files
+            </Link>
+          </nav>
+        </aside>
+        <main className="flex-1 p-6">
+          {competition ? (
+            <>
+              <section className="mb-8">
+                <h3 className="text-2xl font-semibold mb-2">
+                  {competition.title} Dashboard
+                </h3>
+                <h2 className="text-xl font-semibold mb-4">
+                  Join Code:{" "}
+                  <span className="font-bold text-yellow-500">{code}</span>
+                </h2>
+                <p>{competition.description}</p>
+                <p>
+                  Start Date:{" "}
+                  {new Date(competition.startDate).toLocaleDateString()}
+                </p>
+                <p>
+                  End Date: {new Date(competition.endDate).toLocaleDateString()}
+                </p>
+              </section>
+              <section className="mb-8">
+                <h3 className="text-2xl font-semibold mb-2">Checklist</h3>
+                {competition.checklist.length > 0 ? (
+                  competition.checklist.map((item) => {
+                    const isComplete = item.condition.startsWith("COMPLETE");
+                    const formId = isComplete
+                      ? item.condition.match(/\(([^)]+)\)/)[1]
+                      : null;
+                    const form = forms.find(
+                      (form) => form.templateId === formId
+                    );
+                    let isChecked = false;
+                    if (form) {
+                      isChecked = true;
+                    }
+
+                    return (
+                      <div
+                        key={item.name}
+                        className="mb-4 p-4 bg-yellow-100 rounded flex items-start justify-center"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          readOnly
+                          className="mr-2 h-5 w-5 accent-yellow-500 border-gray-300 rounded focus:ring-yellow-400"
+                        />
+                        <div>
+                          <h4 className="text-lg font-semibold">{item.name}</h4>
+                          <p className="text-sm text-left">
+                            {item.description}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <p>Nothing here!</p>
+                )}
+              </section>
+            </>
+          ) : (
+            <p>Nothing here!</p>
+          )}
+
+          <section className="mb-8">
+            <h3 className="text-2xl font-semibold mb-2">Wordlists</h3>
+            {wordlists.length > 0 ? (
+              wordlists.map((wordlist) => (
                 <div
-                  key={template._id}
-                  style={{
-                    border: "1px solid black",
-                  }}
+                  key={wordlist._id}
+                  className="mb-4 p-4 bg-yellow-100 rounded"
                 >
-                  <Link to={`/competition/${code}/form/${template._id}`}>
-                    {template.title}
+                  <h4 className="text-xl font-semibold">{wordlist.title}</h4>
+                  <p>{wordlist.description}</p>
+                  <Link
+                    to={`/competition/${code}/wordlist/${wordlist._id}`}
+                    className="text-blue-500 hover:underline"
+                  >
+                    View Wordlist
                   </Link>
                 </div>
-              ) : (
-                <div>Already Filled Out</div>
-              )
+              ))
+            ) : (
+              <p>Nothing here!</p>
             )}
-          </div>
-          <div>
-            <h1>Checklist</h1>
-            {competition.checklist.map((item) => {
-              const isComplete = item.condition.startsWith("COMPLETE");
-              const formId = isComplete
-                ? item.condition.match(/\(([^)]+)\)/)[1]
-                : null;
-              const form = forms.find((form) => form.templateId === formId);
-              let isChecked = false;
-              if (form) {
-                isChecked = true;
-              }
-
-              return (
-                <div key={item.name}>
-                  <h3>{item.name}</h3>
-                  <p>{item.description}</p>
-                  <input type="checkbox" checked={isChecked} readOnly />
-                </div>
-              );
-            })}
-          </div>
-        </>
-      )}
-      <h1>Files</h1>
-      {files.map((file) => (
-        <div key={file.id}>
-          <a
-            href={`http://localhost:8080/api/file/${file.fileId}`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            {file.filename}
-          </a>
-        </div>
-      ))}
-      <h1>Posts</h1>
-      {posts.map((post) => (
-        <div key={post._id}>
-          <h3>{post.title}</h3>
-          <p>{post.description}</p>
-          {post.content.map((content, index) => (
-            <div key={index}>
-              <p>{content}</p>
-              {post.images[index] && (
-                <img src={post.images[index]} alt="post"></img>
-              )}
-            </div>
-          ))}
-        </div>
-      ))}
-
-      <h1>Wordlists</h1>
-      {wordlists.map((wordlist) => (
-        <div
-          key={wordlist._id}
-          style={{
-            border: "1px solid black",
-          }}
-        >
-          <h3>{wordlist.title}</h3>
-          <p>{wordlist.description}</p>
-          <Link to={`/competition/${code}/wordlist/${wordlist._id}`}>
-            View Wordlist
-          </Link>
-        </div>
-      ))}
+          </section>
+        </main>
+      </div>
     </div>
   );
 };

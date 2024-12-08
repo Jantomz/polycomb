@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import Logout from "../../components/auth/Logout.js";
 import { useEffect, useState } from "react";
 import useApi from "../../hooks/useApi.js";
 import { useNavigate } from "react-router-dom";
@@ -22,36 +21,56 @@ const Dashboard = ({ user, userData }) => {
   }, [userData]);
 
   return (
-    <div>
-      <h1>Admin Dashboard</h1>
-      {user.photoURL && <img src={user.photoURL} alt="profile"></img>}
-      <h2>{user.displayName || user.email}</h2>
-      <div>
-        {competitions.map((competition) => (
-          <button
-            onClick={() => {
-              navigate(`/competition/${competition.code}`);
-            }}
-            key={competition._id}
-            style={{
-              border: "1px solid black",
-            }}
+    <div className="p-8  min-h-screen">
+      <section className="mb-12">
+        <h1 className="text-6xl font-bold mb-12 text-center text-gray-900">
+          Admin Dashboard
+        </h1>
+        <h2 className="text-3xl font-semibold mb-8 text-gray-800">
+          Your Competitions
+        </h2>
+        <div className="flex flex-wrap gap-4 justify-center">
+          {competitions.map((competition) => (
+            <button
+              onClick={() => {
+                navigate(`/competition/${competition.code}`);
+              }}
+              key={competition._id}
+              className="border-4 border-yellow-200 p-4 rounded-lg bg-yellow-300 hover:bg-yellow-400 transition duration-300 ease-in-out transform hover:scale-105"
+            >
+              <h3 className="text-2xl font-semibold text-black mb-2">
+                {competition.title}
+              </h3>
+              <p className="text-sm font-normal text-gray-800 mb-1">
+                {competition.description}
+              </p>
+              <p className="text-sm font-normal text-gray-800 mb-1">
+                Start Date:{" "}
+                {new Date(competition.startDate).toLocaleDateString()}
+              </p>
+              <p className="text-sm font-normal text-gray-800">
+                End Date: {new Date(competition.endDate).toLocaleDateString()}
+              </p>
+            </button>
+          ))}
+        </div>
+        <div className="mt-8 text-center">
+          <Link
+            to="create-competition"
+            className="text-lg font-semibold text-blue-600 hover:underline"
           >
-            <h3>{competition.title}</h3>
-            <p>{competition.description}</p>
-            <p>{new Date(competition.startDate).toLocaleDateString()}</p>
-            <p>{new Date(competition.endDate).toLocaleDateString()}</p>
-          </button>
-        ))}
-      </div>
+            Create Competition
+          </Link>
+        </div>
+      </section>
 
-      <WordlistGenerator user={user} />
-
-      <WordlistDifficulty user={user} />
-
-      <Link to="create-competition">Create Competition</Link>
-
-      <Logout />
+      <h2 className="text-3xl font-semibold mb-4 text-gray-800">
+        Wordlist Tools
+      </h2>
+      <section className="flex flex-col gap-4 justify-center items-center">
+        <WordlistGenerator user={user} />
+        <WordlistDifficulty user={user} />
+      </section>
     </div>
   );
 };

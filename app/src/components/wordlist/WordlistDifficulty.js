@@ -32,69 +32,91 @@ const WordlistDifficulty = () => {
   };
 
   return (
-    <div>
-      <input type="file" accept=".csv" onChange={handleFileChange} />
-      <button onClick={handleUpload}>Upload CSV</button>
+    <div className="flex flex-col items-center justify-center w-max">
+      <div className="border-2 border-yellow-300 p-6 rounded-lg shadow-md">
+        <h1 className="text-2xl font-bold mb-4 text-yellow-700">
+          Wordlist Difficulty Calculator
+        </h1>
+        <div className="flex gap-4 justify-center">
+          <input
+            className="border-2 border-yellow-300 p-2 rounded-lg mb-4 w-1/4"
+            type="file"
+            accept=".csv"
+            onChange={handleFileChange}
+          />
+          <button
+            className="bg-yellow-500 text-white py-2 px-4 rounded-lg hover:bg-yellow-600 transition duration-300 mb-4"
+            onClick={handleUpload}
+          >
+            Upload CSV
+          </button>
+        </div>
+        {words.length > 0 && (
+          <div className="w-1/2 h-80 overflow-y-auto mx-auto">
+            <h3>Preview</h3>
+            {words.map((word, index) => (
+              <div key={index} className="mb-4 p-4 border rounded-lg">
+                <h3 className="text-lg font-bold">{word.word}</h3>
+                <p>Pronunciation: {word.pronunciation}</p>
+                <p>Part of speech: {word.partOfSpeech}</p>
+                <p>Definition: {word.definition}</p>
+                <p>Etymology: {word.etymology}</p>
+                <p>Sentence: {word.sentence}</p>
+                <p>Notes: {word.notes}</p>
+                {word.freq && (
+                  <p className="font-bold">Generated Frequency: {word.freq}</p>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+        {words[words.length - 1]?.freq && (
+          <button
+            className="bg-yellow-500 text-white py-2 px-4 rounded-lg hover:bg-yellow-600 transition duration-300"
+            onClick={() => {
+              const csvHeader = [
+                "Word",
+                "Pronunciation",
+                "Part of Speech",
+                "Definition",
+                "Etymology",
+                "Sentence",
+                "Notes",
+                "Frequency",
+              ].join(",");
 
-      {words.length > 0 && (
-        <>
-          {words.map((word, index) => (
-            <div key={index}>
-              <h3>{word.word}</h3>
-              <p>{word.pronunciation}</p>
-              <p>{word.partOfSpeech}</p>
-              <p>{word.definition}</p>
-              <p>{word.etymology}</p>
-              <p>{word.sentence}</p>
-              <p>{word.notes}</p>
-              {word.freq && <p>{word.freq}</p>}
-            </div>
-          ))}
-        </>
-      )}
-      <button
-        onClick={() => {
-          const csvHeader = [
-            "Word",
-            "Pronunciation",
-            "Part of Speech",
-            "Definition",
-            "Etymology",
-            "Sentence",
-            "Notes",
-            "Frequency",
-          ].join(",");
+              const csvContent =
+                "data:text/csv;charset=utf-8," +
+                csvHeader +
+                "\n" +
+                words
+                  .map((word) =>
+                    [
+                      `"${word.word}"`,
+                      `"${word.pronunciation}"`,
+                      `"${word.partOfSpeech}"`,
+                      `"${word.definition}"`,
+                      `"${word.etymology}"`,
+                      `"${word.sentence}"`,
+                      `"${word.notes}"`,
+                      `"${word.freq}"`,
+                    ].join(",")
+                  )
+                  .join("\n");
 
-          const csvContent =
-            "data:text/csv;charset=utf-8," +
-            csvHeader +
-            "\n" +
-            words
-              .map((word) =>
-                [
-                  `"${word.word}"`,
-                  `"${word.pronunciation}"`,
-                  `"${word.partOfSpeech}"`,
-                  `"${word.definition}"`,
-                  `"${word.etymology}"`,
-                  `"${word.sentence}"`,
-                  `"${word.notes}"`,
-                  `"${word.freq}"`,
-                ].join(",")
-              )
-              .join("\n");
-
-          const encodedUri = encodeURI(csvContent);
-          const link = document.createElement("a");
-          link.setAttribute("href", encodedUri);
-          link.setAttribute("download", "wordlist.csv");
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        }}
-      >
-        Download as CSV
-      </button>
+              const encodedUri = encodeURI(csvContent);
+              const link = document.createElement("a");
+              link.setAttribute("href", encodedUri);
+              link.setAttribute("download", "wordlist.csv");
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            }}
+          >
+            Download as CSV
+          </button>
+        )}
+      </div>
     </div>
   );
 };

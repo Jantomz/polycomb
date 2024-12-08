@@ -14,7 +14,14 @@ const GoogleLogin = () => {
     }
   };
 
-  return <button onClick={handleGoogleLogin}>Sign in with Google</button>;
+  return (
+    <button
+      onClick={handleGoogleLogin}
+      className="text-red-800 hover:text-red-900 hover:bg-red-400/30  font-bold py-2 px-4 rounded border-red-300 border-2"
+    >
+      Sign in with Google
+    </button>
+  );
 };
 
 export default GoogleLogin;

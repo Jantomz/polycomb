@@ -104,20 +104,28 @@ const getFileStream = async (req, res) => {
   }
 };
 
-const deleteFile = (req, res) => {
-  req.gfs.remove({ _id: req.params.id, root: "uploads" }, (err, gridStore) => {
+const deleteFile = async (req, res) => {
+  console.log("Deleting file: ", req.params.id);
+  const bucket = new GridFSBucket(mongoose.connection.db, {
+    bucketName: "uploads", // replace with your bucket name
+  });
+
+  bucket.delete(new mongoose.Types.ObjectId(req.params.id), async (err) => {
     if (err) {
       return res.status(404).json({ err: err });
     }
-
-    File.findOneAndDelete({ fileId: req.params.id }, (err, file) => {
-      if (err) {
-        return res.status(404).json({ err: err });
-      }
-    });
-
-    res.status(200).json({ message: "File deleted successfully" });
   });
+
+  console.log("Deleted file 1: ", req.params.id);
+
+  try {
+    const fileRes = await File.findOneAndDelete({ fileId: req.params.id });
+    console.log("Deleted file 2: ", req.params.id);
+    res.status(200).json({ message: "File deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting file:", err);
+    return res.status(404).json({ err: err });
+  }
 };
 
 module.exports = {

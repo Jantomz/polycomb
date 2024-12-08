@@ -31,71 +31,82 @@ import AdminEditWordlist from "./pages/admin/competition/AdminEditWordlist.js";
 import ViewWordlist from "./pages/user/competition/ViewWordlist.js";
 import WordlistPractice from "./pages/user/competition/WordlistPractice.js";
 import useApi from "./hooks/useApi.js";
-
-// TODO: Make the ability to delete and update objects, partially
-// TODO: Make sure to delete files or objects fully, including their related ids from other objects
-
-// TODO: For everything, make sure there is validation and error handling, since it completely crashes when backend is not up
+import Navbar from "./components/misc/Navbar.js";
+import ViewCompetitionPosts from "./pages/ViewCompetitionPosts.js";
+import ViewCompetitionSchedule from "./pages/ViewCompetitionSchedule.js";
+import ViewCompetitionForms from "./pages/ViewCompetitionForms.js";
+import ViewCompetitionFiles from "./pages/ViewCompetitionFiles.js";
+import BackButton from "./components/misc/BackButton.js";
+import Loading from "./pages/Loading.js";
+import NotFound from "./pages/NotFound.js";
 
 function App() {
   const user = useAuth();
   const { getUser, createUser } = useApi();
 
   const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log("User: ", user);
-
-    if (user) {
-      // Check if user is an admin
-      const fetchUserData = async () => {
+    const fetchUserData = async () => {
+      if (user) {
         try {
           const data = await getUser({ uid: user.uid });
           if (data.length === 1) {
-            console.log("User data: ", data[0]);
-            const userData = data[0];
-            setUserData(userData);
-            if (userData.role === "admin") {
-              console.log("User is an admin");
-            } else {
-              console.log("User is not an admin");
-            }
+            setUserData(data[0]);
           } else {
             const createdUserData = await createUser(user);
-            console.error("User not found");
-            console.log("User created: ", createdUserData);
             setUserData(createdUserData);
           }
+          setLoading(false);
         } catch (error) {
           console.error("Error fetching or creating user data: ", error);
         }
-      };
+      } else {
+        if (
+          window.location.pathname === "/login" ||
+          window.location.pathname === "/register"
+        ) {
+          setLoading(false);
+        }
+      }
+    };
 
-      fetchUserData();
-    }
+    fetchUserData();
   }, [user]);
+
+  const renderRoute = (adminComponent, userComponent) => {
+    return user ? (
+      userData && userData.role === "admin" ? (
+        adminComponent
+      ) : (
+        userComponent
+      )
+    ) : (
+      <Navigate to="/login" />
+    );
+  };
+
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <Router>
-      <div className="App">
+      <Navbar user={user} />
+      <div className="App p-12 min-h-screen bg-yellow-100">
+        <BackButton />
         <Routes>
           <Route
             path="/"
-            element={
-              user ? (
-                userData && userData.role === "admin" ? (
-                  <AdminDashboard user={user} userData={userData} />
-                ) : (
-                  <UserDashboard
-                    user={user}
-                    userData={userData}
-                    setUserData={setUserData}
-                  />
-                )
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
+            element={renderRoute(
+              <AdminDashboard user={user} userData={userData} />,
+              <UserDashboard
+                user={user}
+                userData={userData}
+                setUserData={setUserData}
+              />
+            )}
           />
           <Route
             path="/register"
@@ -107,175 +118,91 @@ function App() {
           />
           <Route
             path="/create-competition"
-            element={
-              user ? (
-                userData && userData.role === "admin" ? (
-                  <CreateCompetition
-                    user={user}
-                    userData={userData}
-                    setUserData={setUserData}
-                  />
-                ) : (
-                  <Navigate to="/" />
-                )
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
+            element={renderRoute(
+              <CreateCompetition
+                user={user}
+                userData={userData}
+                setUserData={setUserData}
+              />,
+              <Navigate to="/" />
+            )}
           />
           <Route
             path="/competition/:code"
-            element={
-              user ? (
-                userData && userData.role === "admin" ? (
-                  <AdminCompetitionDash user={user} userData={userData} />
-                ) : (
-                  <UserCompetitionDash user={user} userData={userData} />
-                )
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
+            element={renderRoute(
+              <AdminCompetitionDash user={user} userData={userData} />,
+              <UserCompetitionDash user={user} userData={userData} />
+            )}
           />
           <Route
             path="/competition/:code/edit-schedule"
-            element={
-              user ? (
-                userData && userData.role === "admin" ? (
-                  <AdminEditSchedule user={user} userData={userData} />
-                ) : (
-                  <Navigate to="/" />
-                )
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
+            element={renderRoute(
+              <AdminEditSchedule user={user} userData={userData} />,
+              <Navigate to="/" />
+            )}
           />
           <Route
             path="/competition/:code/edit-timeline"
-            element={
-              user ? (
-                userData && userData.role === "admin" ? (
-                  <AdminEditTimeline user={user} userData={userData} />
-                ) : (
-                  <Navigate to="/" />
-                )
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
+            element={renderRoute(
+              <AdminEditTimeline user={user} userData={userData} />,
+              <Navigate to="/" />
+            )}
           />
           <Route
             path="/competition/:code/edit-checklist"
-            element={
-              user ? (
-                userData && userData.role === "admin" ? (
-                  <AdminEditChecklist user={user} userData={userData} />
-                ) : (
-                  <Navigate to="/" />
-                )
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
+            element={renderRoute(
+              <AdminEditChecklist user={user} userData={userData} />,
+              <Navigate to="/" />
+            )}
           />
           <Route
             path="/competition/:code/form/:templateId"
-            element={
-              user ? (
-                userData && userData.role === "admin" ? (
-                  <AdminForm user={user} userData={userData} />
-                ) : (
-                  <UserForm user={user} userData={userData} />
-                )
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
+            element={renderRoute(
+              <AdminForm user={user} userData={userData} />,
+              <UserForm user={user} userData={userData} />
+            )}
           />
           <Route
             path="/competition/:code/edit-posts"
-            element={
-              user ? (
-                userData && userData.role === "admin" ? (
-                  <AdminEditPosts user={user} userData={userData} />
-                ) : (
-                  <Navigate to="/" />
-                )
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
+            element={renderRoute(
+              <AdminEditPosts user={user} userData={userData} />,
+              <Navigate to="/" />
+            )}
           />
           <Route
             path="/competition/:code/edit-posts/new"
-            element={
-              user ? (
-                userData && userData.role === "admin" ? (
-                  <AdminNewPost user={user} userData={userData} />
-                ) : (
-                  <Navigate to="/" />
-                )
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
+            element={renderRoute(
+              <AdminNewPost user={user} userData={userData} />,
+              <Navigate to="/" />
+            )}
           />
           <Route
             path="/competition/:code/edit-templates"
-            element={
-              user ? (
-                userData && userData.role === "admin" ? (
-                  <AdminEditTemplates user={user} userData={userData} />
-                ) : (
-                  <Navigate to="/" />
-                )
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
+            element={renderRoute(
+              <AdminEditTemplates user={user} userData={userData} />,
+              <Navigate to="/" />
+            )}
           />
           <Route
             path="/competition/:code/edit-templates/new"
-            element={
-              user ? (
-                userData && userData.role === "admin" ? (
-                  <AdminNewTemplate user={user} userData={userData} />
-                ) : (
-                  <Navigate to="/" />
-                )
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
+            element={renderRoute(
+              <AdminNewTemplate user={user} userData={userData} />,
+              <Navigate to="/" />
+            )}
           />
           <Route
             path="/competition/:code/add-wordlist"
-            element={
-              user ? (
-                userData && userData.role === "admin" ? (
-                  <AdminCreateWordlist user={user} userData={userData} />
-                ) : (
-                  <Navigate to="/" />
-                )
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
+            element={renderRoute(
+              <AdminCreateWordlist user={user} userData={userData} />,
+              <Navigate to="/" />
+            )}
           />
           <Route
             path="/competition/:code/wordlist/:wordlistId"
-            element={
-              user ? (
-                userData && userData.role === "admin" ? (
-                  <AdminEditWordlist user={user} userData={userData} />
-                ) : (
-                  <ViewWordlist user={user} userData={userData} />
-                )
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
+            element={renderRoute(
+              <AdminEditWordlist user={user} userData={userData} />,
+              <ViewWordlist user={user} userData={userData} />
+            )}
           />
           <Route
             path="/competition/:code/wordlist/:wordlistId/practice"
@@ -291,7 +218,48 @@ function App() {
               )
             }
           />
-          {/* Add other routes here, make a 404 one later */}
+          <Route
+            path="/competition/:code/posts"
+            element={
+              user && userData ? (
+                <ViewCompetitionPosts user={user} userData={userData} />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="/competition/:code/schedule"
+            element={
+              user && userData ? (
+                <ViewCompetitionSchedule user={user} userData={userData} />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="/competition/:code/forms"
+            element={
+              user && userData ? (
+                <ViewCompetitionForms user={user} userData={userData} />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="/competition/:code/files"
+            element={
+              user && userData ? (
+                <ViewCompetitionFiles user={user} userData={userData} />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
     </Router>

@@ -89,27 +89,27 @@ const getAudioStream = async (req, res) => {
 };
 
 const deleteAudio = async (req, res) => {
-  const { id } = req.params;
-
-  console.log("Deleting audio: ", id);
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res.status(404).json({ error: "Audio not found" });
-  }
-
-  const audioRes = await Audio.findByIdAndDelete(id);
-
+  console.log("Deleting audio: ", req.params.id);
   const bucket = new GridFSBucket(mongoose.connection.db, {
-    bucketName: "audios",
+    bucketName: "audios", // replace with your bucket name
   });
 
-  bucket.delete(id, (err) => {
+  bucket.delete(new mongoose.Types.ObjectId(req.params.id), async (err) => {
     if (err) {
-      console.error("Error deleting audio chunks:", err);
-      return res.status(500).json({ message: "Error deleting audio chunks" });
+      return res.status(404).json({ err: err });
     }
   });
-  res.status(200).json({ message: "Audio deleted successfully" });
+
+  console.log("Deleted audio 1: ", req.params.id);
+
+  try {
+    const fileRes = await Audio.findOneAndDelete({ audioId: req.params.id });
+    console.log("Deleted audio 2: ", req.params.id);
+    res.status(200).json({ message: "Audio deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting file:", err);
+    return res.status(404).json({ err: err });
+  }
 };
 
 module.exports = {

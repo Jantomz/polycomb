@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import useApi from "../../../hooks/useApi.js";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const AdminNewPost = ({ user }) => {
   const { createPost } = useApi();
-  const competitionCode = useParams().code;
+  const { code: competitionCode } = useParams();
   const [formData, setFormData] = useState({
     title: "",
     competitionCode: competitionCode,
@@ -14,6 +14,8 @@ const AdminNewPost = ({ user }) => {
     content: [""],
     images: [""],
   });
+
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -92,21 +94,24 @@ const AdminNewPost = ({ user }) => {
         content: [""],
         images: [""],
       });
+      navigate(`/competition/${competitionCode}`);
     } else {
       alert("Error creating post");
     }
   };
 
   return (
-    <div>
-      <h1>New Post</h1>
-      <form onSubmit={handleSubmit}>
+    <div className="p-6 bg-yellow-50 min-h-screen">
+      <h1 className="text-3xl font-bold text-yellow-700 mb-6">New Post</h1>
+      <form onSubmit={handleSubmit} className="space-y-6">
         <input
+          autoComplete="off"
           name="title"
           placeholder="Title"
           required
           onChange={handleChange}
           value={formData.title}
+          className="w-full p-2 border border-yellow-300 rounded"
         />
         <textarea
           name="description"
@@ -114,46 +119,81 @@ const AdminNewPost = ({ user }) => {
           required
           onChange={handleChange}
           value={formData.description}
+          className="w-full p-2 border border-yellow-300 rounded"
         ></textarea>
         <input
+          autoComplete="off"
           name="tags"
           placeholder="Tags (comma separated)"
           onChange={handleChange}
           value={formData.tags}
+          className="w-full p-2 border border-yellow-300 rounded"
         />
         {formData.content.map((content, index) => (
-          <div key={index}>
+          <div
+            key={index}
+            className="bg-white p-4 rounded-lg shadow-md space-y-4"
+          >
             <textarea
               placeholder="Content"
               required
               onChange={(e) => handleContentChange(index, e.target.value)}
               value={content}
+              className="w-full p-2 border border-yellow-300 rounded"
             ></textarea>
-            <button type="button" onClick={() => deleteContentBlock(index)}>
+            <button
+              type="button"
+              onClick={() => deleteContentBlock(index)}
+              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+            >
               Delete Content Block
             </button>
           </div>
         ))}
-        <button type="button" onClick={addContentBlock}>
+        <button
+          type="button"
+          onClick={addContentBlock}
+          className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
+        >
           Add Content Block
         </button>
         {formData.images.map((image, index) => (
-          <div key={index}>
+          <div
+            key={index}
+            className="bg-white p-4 rounded-lg shadow-md space-y-4"
+          >
             <input
+              autoComplete="off"
               placeholder="Image URL"
               required
               onChange={(e) => handleImageChange(index, e.target.value)}
               value={image}
+              className="w-full p-2 border border-yellow-300 rounded"
             />
-            <button type="button" onClick={() => deleteImageBlock(index)}>
+            <button
+              type="button"
+              onClick={() => deleteImageBlock(index)}
+              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+            >
               Delete Image Block
             </button>
           </div>
         ))}
-        <button type="button" onClick={addImageBlock}>
-          Add Image Block
-        </button>
-        <button type="submit">Submit</button>
+        <div className="flex justify-center m-auto gap-4">
+          <button
+            type="button"
+            onClick={addImageBlock}
+            className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
+          >
+            Add Image Block
+          </button>
+          <button
+            type="submit"
+            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+          >
+            Submit
+          </button>
+        </div>
       </form>
     </div>
   );

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import useApi from "../../../hooks/useApi.js";
 
 const AdminNewTemplate = ({ user }) => {
@@ -11,6 +11,8 @@ const AdminNewTemplate = ({ user }) => {
     creatorId: user.uid,
     fields: [{ name: "", type: "text", required: false }],
   });
+
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -44,6 +46,7 @@ const AdminNewTemplate = ({ user }) => {
 
     if (res) {
       alert("Template created successfully");
+      navigate(`/competition/${competitionCode}`);
       setFormData({
         title: "",
         competitionCode: competitionCode,
@@ -64,52 +67,74 @@ const AdminNewTemplate = ({ user }) => {
   };
 
   return (
-    <div>
-      <h1>New Template</h1>
-      <form onSubmit={handleSubmit}>
+    <div className="p-6 bg-yellow-50 min-h-screen">
+      <h1 className="text-3xl font-bold text-yellow-700 mb-6">New Template</h1>
+      <form onSubmit={handleSubmit} className="space-y-4">
         <input
+          autoComplete="off"
           name="title"
           placeholder="Title"
           required
           onChange={handleChange}
           value={formData.title}
+          className="w-full p-2 border border-yellow-300 rounded"
         />
         {formData.fields.map((field, index) => (
-          <div key={index}>
+          <div key={index} className="space-y-2">
             <input
+              autoComplete="off"
               placeholder="Field Name"
               required
               onChange={(e) => handleFieldChange(index, "name", e.target.value)}
               value={field.name}
+              className="w-full p-2 border border-yellow-300 rounded"
             />
             <select
               onChange={(e) => handleFieldChange(index, "type", e.target.value)}
               value={field.type}
+              className="w-full p-2 border border-yellow-300 rounded"
             >
               <option value="text">Text</option>
               <option value="email">Email</option>
               <option value="date">Date</option>
               <option value="number">Number</option>
             </select>
-            <label>
+            <label className="flex items-center space-x-2">
               <input
+                autoComplete="off"
                 type="checkbox"
                 checked={field.required}
                 onChange={(e) =>
                   handleFieldChange(index, "required", e.target.checked)
                 }
+                className="form-checkbox"
               />
-              Required
+              <span>Required</span>
             </label>
-            <button type="button" onClick={() => removeField(index)}>
-              Remove
+            <button
+              type="button"
+              onClick={() => removeField(index)}
+              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+            >
+              Remove Field
             </button>
           </div>
         ))}
-        <button type="button" onClick={addField}>
-          Add Field
-        </button>
-        <button type="submit">Submit</button>
+        <div className="flex justify-center m-auto gap-4">
+          <button
+            type="button"
+            onClick={addField}
+            className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
+          >
+            Add Field
+          </button>
+          <button
+            type="submit"
+            className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
+          >
+            Submit
+          </button>
+        </div>
       </form>
     </div>
   );
