@@ -5,6 +5,7 @@ const {
   uploadAudio,
   getAudios,
   getAudioStream,
+  deleteAudio,
 } = require("../controllers/audioController.js");
 
 const mongoose = require("mongoose");
@@ -46,5 +47,7 @@ router.get("/wordlist/:wordlistId", getAudios);
 router.post("/", upload.single("audio"), uploadAudio);
 
 router.get("/:id", getAudioStream);
+
+router.delete("/:id", deleteAudio);
 
 module.exports = router;

@@ -90,6 +90,41 @@ const updateWord = async (req, res) => {
   res.status(200).json(updatedWord);
 };
 
+const deleteWord = async (req, res) => {
+  const { wordId } = req.params;
+
+  console.log("Deleting word: ", wordId);
+
+  if (!mongoose.Types.ObjectId.isValid(wordId)) {
+    return res.status(404).json({ error: "Word not found" });
+  }
+
+  await Word.findByIdAndDelete(wordId);
+
+  await Wordlist.findOneAndUpdate(
+    { words: wordId },
+    { $pull: { words: wordId } }
+  );
+
+  res.status(200).json({ message: "Word deleted successfully" });
+};
+
+const deleteWordlist = async (req, res) => {
+  const { wordlistId } = req.params;
+
+  console.log("Deleting wordlist: ", wordlistId);
+
+  if (!mongoose.Types.ObjectId.isValid(wordlistId)) {
+    return res.status(404).json({ error: "Wordlist not found" });
+  }
+
+  await Wordlist.findByIdAndDelete(wordlistId);
+
+  await Word.deleteMany({ wordlistId: wordlistId });
+
+  res.status(200).json({ message: "Wordlist and words deleted successfully" });
+};
+
 // exporting all the function controllers
 module.exports = {
   getWordlists,
@@ -97,4 +132,6 @@ module.exports = {
   createWordlist,
   getWord,
   updateWord,
+  deleteWord,
+  deleteWordlist,
 };

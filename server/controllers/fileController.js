@@ -104,8 +104,25 @@ const getFileStream = async (req, res) => {
   }
 };
 
+const deleteFile = (req, res) => {
+  req.gfs.remove({ _id: req.params.id, root: "uploads" }, (err, gridStore) => {
+    if (err) {
+      return res.status(404).json({ err: err });
+    }
+
+    File.findOneAndDelete({ fileId: req.params.id }, (err, file) => {
+      if (err) {
+        return res.status(404).json({ err: err });
+      }
+    });
+
+    res.status(200).json({ message: "File deleted successfully" });
+  });
+};
+
 module.exports = {
   uploadFile,
   getFiles,
   getFileStream,
+  deleteFile,
 };

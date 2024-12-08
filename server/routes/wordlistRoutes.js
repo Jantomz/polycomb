@@ -7,6 +7,8 @@ const {
   createWordlist,
   getWord,
   updateWord,
+  deleteWord,
+  deleteWordlist,
 } = require("../controllers/wordlistController");
 
 const router = express.Router();
@@ -21,5 +23,9 @@ router.post("/", createWordlist);
 router.get("/word/:wordId", getWord);
 
 router.patch("/word/:wordId", updateWord);
+
+router.delete("/word/:wordId", deleteWord);
+
+router.delete("/wordlist/:wordlistId", deleteWordlist);
 
 module.exports = router;

@@ -5,6 +5,7 @@ const {
   uploadFile,
   getFiles,
   getFileStream,
+  deleteFile,
 } = require("../controllers/fileController.js");
 
 const mongoose = require("mongoose");
@@ -46,5 +47,7 @@ router.get("/competition/:competitionCode", getFiles);
 router.post("/", upload.single("file"), uploadFile);
 
 router.get("/:id", getFileStream);
+
+router.delete("/:id", deleteFile);
 
 module.exports = router;

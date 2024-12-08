@@ -111,6 +111,22 @@ const getTemplateForms = async (req, res) => {
   res.status(200).json(forms);
 };
 
+const deleteTemplate = async (req, res) => {
+  const { id } = req.params;
+
+  console.log("Deleting template: ", id);
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(404).json({ error: "Template not found" });
+  }
+
+  await Template.findByIdAndDelete(id);
+
+  await Form.deleteMany({ templateId: id });
+
+  res.status(200).json({ message: "Template and forms deleted successfully" });
+};
+
 // exporting all the function controllers
 module.exports = {
   createTemplate,
@@ -122,4 +138,5 @@ module.exports = {
   getForm,
   getUserForms,
   getTemplateForms,
+  deleteTemplate,
 };

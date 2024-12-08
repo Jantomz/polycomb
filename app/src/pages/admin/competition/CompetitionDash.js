@@ -14,6 +14,7 @@ const CompetitionDash = ({ user }) => {
     getWord,
     getUsers,
     getTemplateForms,
+    deleteFile,
   } = useApi();
   const [code, setCode] = useState(useParams().code);
 
@@ -173,7 +174,7 @@ const CompetitionDash = ({ user }) => {
       </div>
       <h1>Files</h1>
       {files.map((file) => (
-        <div key={file.id}>
+        <div key={file.fileId}>
           <a
             // TODO: Need to change this to the correct URL
             href={`http://localhost:8080/api/file/${file.fileId}`}
@@ -182,6 +183,9 @@ const CompetitionDash = ({ user }) => {
           >
             {file.filename}
           </a>
+          <button onClick={() => deleteFile({ fileId: file.fileId })}>
+            Delete File
+          </button>
         </div>
       ))}
       <h1>Posts</h1>
@@ -195,6 +199,16 @@ const CompetitionDash = ({ user }) => {
               {post.images[index] && (
                 <img src={post.images[index]} alt="post"></img>
               )}
+            </div>
+          ))}
+          {post.images.slice(post.content.length).map((image, index) => (
+            <div key={index}>
+              <img src={image} alt="post"></img>
+            </div>
+          ))}
+          {post.content.slice(post.images.length).map((content, index) => (
+            <div key={index}>
+              <p>{content}</p>
             </div>
           ))}
         </div>

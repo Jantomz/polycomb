@@ -42,6 +42,15 @@ const useApi = () => {
     }
   };
 
+  const getUser = async ({ uid }) => {
+    const response = await fetch(`${BASE_URL}/auth/${uid}`, {
+      method: "GET",
+    });
+    const data = await response.json();
+
+    return data;
+  };
+
   const addCompetition = async ({ code, userId }) => {
     try {
       console.log("Adding competition to user: ", code, userId);
@@ -427,6 +436,38 @@ const useApi = () => {
     }
   };
 
+  const deletePost = async ({ postId }) => {
+    try {
+      console.log("Deleting post: ", postId);
+      const response = await fetch(`${BASE_URL}/post/${postId}`, {
+        method: "DELETE",
+      });
+      const data = await response.json();
+
+      return data;
+    } catch (error) {
+      console.error("Error deleting post: ", error);
+    }
+  };
+
+  const updatePost = async ({ postId, post }) => {
+    try {
+      console.log("Updating post: ", postId, post);
+      const response = await fetch(`${BASE_URL}/post/${postId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(post),
+      });
+      const data = await response.json();
+
+      return data;
+    } catch (error) {
+      console.error("Error updating post: ", error);
+    }
+  };
+
   const createWordlist = async ({
     title,
     description,
@@ -515,7 +556,7 @@ const useApi = () => {
     }
   };
 
-  const uploadAudio = async ({ audio, creatorId, wordId }) => {
+  const uploadAudio = async ({ audio, creatorId, wordId, oldAudioId }) => {
     try {
       console.log("Posting audio: ", audio);
       const formData = new FormData();
@@ -539,6 +580,14 @@ const useApi = () => {
             audioId: data.dbAudio.audioId,
           }),
         });
+
+        if (oldAudioId) {
+          await fetch(`${BASE_URL}/audio/${oldAudioId}`, {
+            method: "DELETE",
+          });
+        }
+
+        console.log("Updated word with audio: ", wordId);
       }
 
       return data;
@@ -635,11 +684,96 @@ const useApi = () => {
     }
   };
 
+  const createUser = async ({ user }) => {
+    const response = await fetch(`${BASE_URL}/auth`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        uid: user.uid,
+        email: user.email,
+        role: "user",
+      }),
+    });
+    const data = await response.json();
+
+    return data;
+  };
+
+  const deleteTemplate = async ({ templateId }) => {
+    try {
+      console.log("Deleting template: ", templateId);
+      const response = await fetch(`${BASE_URL}/form/templates/${templateId}`, {
+        method: "DELETE",
+      });
+      const data = await response.json();
+
+      return data;
+    } catch (error) {
+      console.error("Error deleting template: ", error);
+    }
+  };
+
+  const deleteFile = async ({ fileId }) => {
+    try {
+      console.log("Deleting file", fileId);
+
+      const response = await fetch(`${BASE_URL}/file/${fileId}`, {
+        method: "DELETE",
+      });
+
+      const data = await response.json();
+
+      return data;
+    } catch (error) {
+      console.error("Error deleting file: ", error);
+    }
+  };
+
+  const deleteWord = async ({ wordId, audioId }) => {
+    try {
+      console.log("Deleting word: ", wordId);
+      const response = await fetch(`${BASE_URL}/wordlist/word/${wordId}`, {
+        method: "DELETE",
+      });
+      const data = await response.json();
+
+      if (audioId) {
+        await fetch(`${BASE_URL}/audio/${audioId}`, {
+          method: "DELETE",
+        });
+      }
+
+      return data;
+    } catch (error) {
+      console.error("Error deleting word: ", error);
+    }
+  };
+
+  const deleteWordlist = async ({ wordlistId }) => {
+    try {
+      console.log("Deleting wordlist: ", wordlistId);
+      const response = await fetch(
+        `${BASE_URL}/wordlist/wordlist/${wordlistId}`,
+        {
+          method: "DELETE",
+        }
+      );
+      const data = await response.json();
+
+      return data;
+    } catch (error) {
+      console.error("Error deleting wordlist: ", error);
+    }
+  };
+
   // TODO: Set up delete and update endpoints later on
 
   return {
     createCompetition,
     addCompetition,
+    getUser,
     getUserCompetitions,
     getCompetition,
     addParticipant,
@@ -656,6 +790,8 @@ const useApi = () => {
     getFiles,
     getPosts,
     createPost,
+    deletePost,
+    updatePost,
     createWordlist,
     getWordlists,
     getWord,
@@ -665,6 +801,11 @@ const useApi = () => {
     setWordlistPractice,
     getUsers,
     generateWordFrequency,
+    createUser,
+    deleteTemplate,
+    deleteFile,
+    deleteWord,
+    deleteWordlist,
   };
 };
 

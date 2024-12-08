@@ -4,7 +4,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import React, { useRef } from "react";
 
 const AdminEditWordlist = ({ user, userData }) => {
-  const { getWordlist, getWord, uploadAudio } = useApi();
+  const { getWordlist, getWord, uploadAudio, deleteWord, deleteWordlist } =
+    useApi();
   const code = useParams().code;
   const wordlistId = useParams().wordlistId;
   const [wordlist, setWordlist] = useState([]);
@@ -15,6 +16,8 @@ const AdminEditWordlist = ({ user, userData }) => {
   const [totalPages, setTotalPages] = useState(1);
   const navigate = useNavigate();
   const pageSize = 20;
+
+  // wordlists can't be added to or changed much, since they are csv based, we want it to be finalized
 
   useEffect(() => {
     const performInitialRender = async () => {
@@ -48,7 +51,15 @@ const AdminEditWordlist = ({ user, userData }) => {
   const postAudio = async ({ wordId, audio }) => {
     // Delete old audio if it exists
     console.log("Uploading audio", wordId, audio);
-    const resAudio = await uploadAudio({ audio, wordId, creatorId: user.uid });
+
+    const word = await getWord({ wordId });
+
+    const resAudio = await uploadAudio({
+      audio,
+      wordId,
+      creatorId: user.uid,
+      oldAudioId: word.audioId,
+    });
     fetchWords(currentPage);
 
     console.log("Uploaded audio", resAudio);
@@ -79,52 +90,76 @@ const AdminEditWordlist = ({ user, userData }) => {
   return (
     <div>
       <h1>Edit Wordlist</h1>
+      <button
+        onClick={() => {
+          const removeWordlist = async () => {
+            await deleteWordlist({ wordlistId });
+            navigate(`/competition/${code}`);
+          };
+
+          removeWordlist();
+        }}
+      >
+        Delete Wordlist
+      </button>
       {wordlist && (
         <>
           <h2>{wordlist.title}</h2>
           <p>{wordlist.description}</p>
-          {words.map((word) => (
-            <div
-              key={word._id}
-              style={{
-                border: "1px solid black",
-              }}
-            >
-              <h3>{word.word}</h3>
-              <p>{word.pronunciation}</p>
-              <p>{word.partOfSpeech}</p>
-              <p>{word.definition}</p>
-              <p>{word.sentence}</p>
-              <p>{word.notes}</p>
+          {words.map(
+            (word) =>
+              word._id && (
+                <div
+                  key={word._id}
+                  style={{
+                    border: "1px solid black",
+                  }}
+                >
+                  <h3>{word.word}</h3>
+                  <p>{word.pronunciation}</p>
+                  <p>{word.partOfSpeech}</p>
+                  <p>{word.definition}</p>
+                  <p>{word.sentence}</p>
+                  <p>{word.notes}</p>
 
-              {word.audioId && (
-                <audio controls>
-                  <source
-                    src={`http://localhost:8080/api/audio/${word.audioId}`}
-                    type="audio/mpeg"
-                  />
-                </audio>
-              )}
-              <>
-                {isRecording === word._id ? (
-                  <button onClick={stopRecording}>Stop Recording</button>
-                ) : (
-                  <button onClick={() => startRecording({ wordId: word._id })}>
-                    Start Recording
+                  {word.audioId && (
+                    <audio controls>
+                      <source
+                        src={`http://localhost:8080/api/audio/${word.audioId}`}
+                        type="audio/mpeg"
+                      />
+                    </audio>
+                  )}
+                  <>
+                    {isRecording === word._id ? (
+                      <button onClick={stopRecording}>Stop Recording</button>
+                    ) : (
+                      <button
+                        onClick={() => startRecording({ wordId: word._id })}
+                      >
+                        Start Recording
+                      </button>
+                    )}
+                  </>
+
+                  <button
+                    onClick={() => {
+                      const removeWord = async () => {
+                        await deleteWord({
+                          wordId: word._id,
+                          audioId: word.audioId || null,
+                        });
+                        await fetchWords(currentPage);
+                      };
+
+                      removeWord();
+                    }}
+                  >
+                    Delete
                   </button>
-                )}
-              </>
-
-              <button
-                onClick={() => {
-                  setShowDeletePopup(true);
-                  setWordToDelete(word);
-                }}
-              >
-                Delete
-              </button>
-            </div>
-          ))}
+                </div>
+              )
+          )}
           <div>
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
               <button

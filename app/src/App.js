@@ -30,17 +30,16 @@ import AdminCreateWordlist from "./pages/admin/competition/AdminCreateWordlist.j
 import AdminEditWordlist from "./pages/admin/competition/AdminEditWordlist.js";
 import ViewWordlist from "./pages/user/competition/ViewWordlist.js";
 import WordlistPractice from "./pages/user/competition/WordlistPractice.js";
+import useApi from "./hooks/useApi.js";
 
 // TODO: Make the ability to delete and update objects, partially
 // TODO: Make sure to delete files or objects fully, including their related ids from other objects
-
-// TODO: Move this to useApi.js
-const BASE_URL = "http://localhost:8080/api";
 
 // TODO: For everything, make sure there is validation and error handling, since it completely crashes when backend is not up
 
 function App() {
   const user = useAuth();
+  const { getUser, createUser } = useApi();
 
   const [userData, setUserData] = useState(null);
 
@@ -51,10 +50,7 @@ function App() {
       // Check if user is an admin
       const fetchUserData = async () => {
         try {
-          const response = await fetch(`${BASE_URL}/auth/${user.uid}`, {
-            method: "GET",
-          });
-          const data = await response.json();
+          const data = await getUser({ uid: user.uid });
           if (data.length === 1) {
             console.log("User data: ", data[0]);
             const userData = data[0];
@@ -65,19 +61,8 @@ function App() {
               console.log("User is not an admin");
             }
           } else {
+            const createdUserData = await createUser(user);
             console.error("User not found");
-            const createUserResponse = await fetch(`${BASE_URL}/auth`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                uid: user.uid,
-                email: user.email,
-                role: "user",
-              }),
-            });
-            const createdUserData = await createUserResponse.json();
             console.log("User created: ", createdUserData);
             setUserData(createdUserData);
           }

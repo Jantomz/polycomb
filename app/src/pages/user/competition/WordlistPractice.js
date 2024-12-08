@@ -105,6 +105,9 @@ const WordlistPractice = ({ user, userData, setUserData }) => {
         currIndex =
           userData.wordlistsStudyDepth[wordlistExistenceIndex].currentIndex;
         ord = userData.wordlistsStudyDepth[wordlistExistenceIndex].order;
+        if (currIndex === ord.length - 1) {
+          currIndex = 0;
+        }
         setCurrentIndex(currIndex);
         setOrder(ord);
         console.log("Grabbing from userData", currIndex, ord);

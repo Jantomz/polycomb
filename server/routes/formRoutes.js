@@ -11,6 +11,7 @@ const {
   getForm,
   getUserForms,
   getTemplateForms,
+  deleteTemplate,
 } = require("../controllers/formController");
 
 const router = express.Router();
@@ -42,5 +43,7 @@ router.post("/forms", createForm);
 router.get("/user-forms/:competitionCode/:userId", getUserForms);
 
 router.get("/template-forms/:templateId", getTemplateForms);
+
+router.delete("/templates/:id", deleteTemplate);
 
 module.exports = router;

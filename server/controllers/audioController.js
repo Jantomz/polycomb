@@ -88,8 +88,33 @@ const getAudioStream = async (req, res) => {
   }
 };
 
+const deleteAudio = async (req, res) => {
+  const { id } = req.params;
+
+  console.log("Deleting audio: ", id);
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(404).json({ error: "Audio not found" });
+  }
+
+  const audioRes = await Audio.findByIdAndDelete(id);
+
+  const bucket = new GridFSBucket(mongoose.connection.db, {
+    bucketName: "audios",
+  });
+
+  bucket.delete(id, (err) => {
+    if (err) {
+      console.error("Error deleting audio chunks:", err);
+      return res.status(500).json({ message: "Error deleting audio chunks" });
+    }
+  });
+  res.status(200).json({ message: "Audio deleted successfully" });
+};
+
 module.exports = {
   uploadAudio,
   getAudios,
   getAudioStream,
+  deleteAudio,
 };

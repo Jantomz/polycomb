@@ -3,20 +3,22 @@ import useApi from "../../../hooks/useApi.js";
 import { useNavigate, useParams } from "react-router-dom";
 
 const AdminEditTemplates = ({ user, userData }) => {
-  const { getCompetitionTemplates } = useApi();
+  // Not allowed to update templates, as that breaks down the user's responses
+  const { getCompetitionTemplates, deleteTemplate } = useApi();
   const competitionCode = useParams().code;
   const [templates, setTemplates] = useState([]);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [templateToDelete, setTemplateToDelete] = useState(null);
   const navigate = useNavigate();
 
+  const performInitialRender = async () => {
+    const templates = await getCompetitionTemplates({
+      competitionCode,
+    });
+    setTemplates(templates);
+  };
+
   useEffect(() => {
-    const performInitialRender = async () => {
-      const templates = await getCompetitionTemplates({
-        competitionCode,
-      });
-      setTemplates(templates);
-    };
     performInitialRender();
   }, [userData]);
 
@@ -42,22 +44,14 @@ const AdminEditTemplates = ({ user, userData }) => {
           ))}
           <button
             onClick={() => {
-              setShowDeletePopup(true);
-              setTemplateToDelete(template);
+              deleteTemplate({ templateId: template._id });
+              performInitialRender();
             }}
           >
             Delete
           </button>
         </div>
       ))}
-      {/* {showDeletePopup && (
-                <DeletePopup
-                    deleteFunction={deleteTemplate}
-                    itemToDelete={templateToDelete}
-                    setItemToDelete={setTemplateToDelete}
-                    setShowDeletePopup={setShowDeletePopup}
-                />
-            )} */}
     </div>
   );
 };
