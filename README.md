@@ -12,7 +12,7 @@ Welcome to Polycomb, a spelling bee management software for organizations to cre
     - [Account Creation](#account-creation)
   - [A web browser via polycomb.jadenzhang.com](#a-web-browser-via-polycombjadenzhangcom)
   - [A desktop application](#a-desktop-application)
-  - [Raw Text ReadMe](#raw-text-readme)
+- [Raw text readMe](#raw-text-readme)
 
 ## Video Demo
 
@@ -100,7 +100,9 @@ In the repository: [Polycomb Repository](https://github.com/Jantomz/polycomb), t
 
 Once the download is complete, locate the `.exe` file and double-click it. This will go through the correct steps and successfully open the application!
 
-### Raw Text ReadMe
+### Raw text readMe
+
+#### This raw text is the same as the one above, just not formatted - for the sake of demonstrating my initial ReadMe nuance
 
 Welcome to Polycomb, a spelling bee management software for organizations to create competitions and share information with their spellers. This manual will show you how to begin using it, as well as provide an overview of what you can do in Polycomb!
 
