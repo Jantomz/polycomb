@@ -18,9 +18,7 @@ function createWindow() {
   });
 
   // Determine the URL to load based on the environment (development or production)
-  const startURL = isDev
-    ? "http://localhost:3000" // In development, load the React app from localhost
-    : `file://${path.join(__dirname, "../build/index.html")}`; // In production, load the built React app
+  const startURL = "https://polycomb.jadenzhang.com"; // In development, load the React app from localhost
 
   mainWindow.loadURL(startURL); // Load the determined URL into the window
 

@@ -21,10 +21,11 @@ This video does not cover the majority of functionalities in the application. Th
 
 ## Usage
 
-There are two ways you can use this project:
+There are three ways you can use this project:
 
 1. A web browser via local deployment
-2. A web browser via [polycomb.jadenzhang.com](http://polycomb.jadenzhang.com)
+2. A web browser via [polycomb.jadenzhang.com](http://polycomb.jadenzhang.com) (NOTE THAT GOOGLE SIGN IN DOES NOT WORK HERE)
+3. A desktop application only for windows (as apple is silly with its $99 subscription program)
 
 ### A web browser via local deployment
 
@@ -92,13 +93,29 @@ Now you have successfully locally deployed Polycomb! Feel free to explore. Techn
 
 Go to your browser of choice and enter [polycomb.jadenzhang.com](http://polycomb.jadenzhang.com).
 
+#### Steps to Use Polycomb via polycomb.jadenzhang.com
+
+1. **Deploy the Backend Locally**
+
+   - Follow the steps in the [Steps to Deploy Locally](#steps-to-deploy-locally) section, but only for the `server` folder.
+   - Ensure the backend is running on your local machine.
+
+2. **Access the Application**
+   - Open your web browser and go to [polycomb.jadenzhang.com](http://polycomb.jadenzhang.com).
+   - The web application will connect to your locally hosted backend.
+
 Voila! You have successfully accessed Polycomb via a browser from my website!
 
 ### A desktop application
 
-In the repository: [Polycomb Repository](https://github.com/Jantomz/polycomb), the right-hand side has a `releases` section. Click on the release, and download the correct version. This should be an executable for Windows operating system.
+Perform everything you did in method 1, where you host the frontend and backend on your machine. But then, open up another terminal and type:
 
-Once the download is complete, locate the `.exe` file and double-click it. This will go through the correct steps and successfully open the application!
+```sh
+cd app
+npm run electron
+```
+
+This will open the desktop app!
 
 ### Raw text readMe
 
@@ -152,3 +169,13 @@ Do all previous steps for the local hosting, but only for "server"
 The web browser will need your locally hosted backend to run! (Backend hosting on the cloud is expensive and/or time consuming)
 
 Voila! You have successfully accessed Polycomb via a browser from my website!
+
+Desktop Application
+Perform everything you did in method 1, where you host the frontend and backend on your machine. But then, open up another terminal and type:
+
+```sh
+cd app
+npm run electron
+```
+
+This will open the desktop app!
