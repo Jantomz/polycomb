@@ -22,7 +22,7 @@ const ViewCompetitionFiles = () => {
       }
     };
     fetchFiles(); // Calling the fetchFiles function
-  }, [code, getFiles]); // Dependency array to re-run effect if code or getFiles changes
+  }, []); // Dependency array to re-run effect if code or getFiles changes
 
   if (loading) {
     return <p>Loading...</p>; // Display loading message while fetching files
@@ -42,12 +42,12 @@ const ViewCompetitionFiles = () => {
             className="mb-4 p-4 bg-yellow-100 rounded flex justify-between items-center"
           >
             <a
-              href={`http://localhost:8080/api/file/${file.fileId}`} // Link to download the file
+              href={`http://localhost:8080/api/file/${file.fileId}`}
               target="_blank"
               rel="noreferrer"
               className="text-blue-500 hover:underline"
             >
-              {file.filename} // Displaying the filename
+              {file.filename}
             </a>
           </div>
         ))

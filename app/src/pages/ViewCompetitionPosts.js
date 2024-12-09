@@ -28,7 +28,7 @@ const ViewCompetitionPosts = () => {
     };
 
     fetchPosts(); // Call the fetchPosts function
-  }, [code, getPosts]); // Dependency array to re-run effect when code or getPosts changes
+  }, []); // Dependency array to re-run effect when code or getPosts changes
 
   return (
     <div className="min-h-screen bg-yellow-50 p-6">

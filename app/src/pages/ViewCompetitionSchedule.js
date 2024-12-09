@@ -22,7 +22,7 @@ const ViewCompetitionSchedule = () => {
       }
     };
     fetchCompetition(); // Calling the fetch function
-  }, [code, getCompetition]); // Dependencies array for useEffect
+  }, []); // Dependencies array for useEffect
 
   if (loading) {
     return <p className="text-center text-gray-500">Loading...</p>; // Display loading message

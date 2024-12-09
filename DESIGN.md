@@ -2,6 +2,11 @@
 
 Welcome to the design document for Polycomb. This markdown file will provide insight into why I made the design choices I made and a rough overview of using the application.
 
+## NOTE
+
+Polycomb is more so a functionality application, and so it has many many parts to it that were unable to be in the live demo.
+Examples are creating posts and practicing wordlists.
+
 ## Design Choices
 
 There are a few categories of design choices, which are split into many more. Here is the rough tree:
@@ -115,4 +120,7 @@ I decided to leave the .env in the github repository for the sake of ease when l
 
 ## Overview of the Application
 
-Polycomb has two main ways to use it, as an admin, or as a user/speller. As an admin, you can create competitions and add details to them. You can upload files and wordlists for spellers to access. As a speller/user, you can access all the information and files the administrator has put up, as well as practice the word lists provided :)
+Polycomb has two main ways to use it, as an admin, or as a user/speller. As an admin, you can create competitions and add details to them. You can upload files and wordlists for spellers to access. As a speller/user, you can access all the information and files the administrator has put up, as well as practice the word lists provided :) The video linked in the README will give a fun demo.
+
+Notes on Goals:
+I achieved all goals that I made, except for intentionally leaving out payment and the leaderboard system. The payment will not be added here, as that contains actually API keys I can't disclose, and so would make the local version quite difficult. The leaderboard system was avoided as that is actually skewed against the rules of a spelling bee, where the spellers can technically compete before the competition. However, since I left these stretch goals out, I decided to make the editing and audio/file components of the application more robust, which I hope makes up for it. The ability to edit posts, templates, schedules and other things is quite neat, and I did not think about adding that before.
