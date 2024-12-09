@@ -16,8 +16,9 @@ Welcome to Polycomb, a spelling bee management software for organizations to cre
 
 ## Video Demo
 
-[Watch the video demo](#https://www.youtube.com/watch?v=oagr_u9Uv2A)
-This video does not cover the majority of functionalities in the application. There are many more things added in that can be explored with the provided methods of trying it below.
+[Watch the video demo](https://www.youtube.com/watch?v=oagr_u9Uv2A)
+
+This video does not cover the majority of functionalities in the application. There are many more features that can be explored using the methods provided below.
 
 ## Usage
 
