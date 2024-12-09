@@ -13,6 +13,7 @@ const WordlistGenerator = () => {
         <input
           className="border-2 border-yellow-300 p-2 rounded-lg mb-4 w-full"
           type="number"
+          min="1"
           name="size"
           onChange={(e) => setSize(e.target.value)} // Update 'size' state when input value changes
           value={size} // Bind input value to 'size' state

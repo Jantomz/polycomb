@@ -64,6 +64,7 @@ To begin, let’s take a quick look at the base structure of the project. Go to 
      npm i
      ```
    - Note that you must have Node.js installed to run this command. If you need to install Node.js, do so [here](https://nodejs.org/en/download/package-manager).
+   - The zip file does not have the node_modules or package-lock.json, this should make it for you!
 
 3. **Run the Application**
    - In both terminals, type:
