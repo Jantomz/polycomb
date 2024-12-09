@@ -122,5 +122,20 @@ I decided to leave the .env in the github repository for the sake of ease when l
 
 Polycomb has two main ways to use it, as an admin, or as a user/speller. As an admin, you can create competitions and add details to them. You can upload files and wordlists for spellers to access. As a speller/user, you can access all the information and files the administrator has put up, as well as practice the word lists provided :) The video linked in the README will give a fun demo.
 
-Notes on Goals:
+## Overview on Using the Wordlist Functionalities
+
+Following login as an admin, you will be met with the possibility to use wordlist tools. The wordlists must follow the format of having these headers: "Word, Part of Speech", "Pronunciation", "Definition", "Etymology", "Sentence"
+As long as those headers exist, then the wordlist should be acceptable. Please make sure its the right file type. It helps with processing
+
+## Overview on Other Functionalities
+
+All other functionalities should be a bit more understandable. Just feel free to explore, the components are more spelling bee based, so those unfamiliar with the world may be a bit confused. Some quick tips:
+
+- The upload of files as an admin is just that, uploading a pdf. However, it's functionality can range from sending wordlists to sending certificates for spellers. Make sure to click "Upload" to ensure the pdf gets uploaded.
+- Practicing the word lists is a bit finicky, though it should work only for words with audio. If a wordlist has no audio, none of the words will ever show up. This is not quite user friendly unfortunately.
+- Creating a new post as an admin, you can add image urls into the image blocks to show them in the post. The posts and images are interwoven.
+- Make sure to save when you edit any schedules, timelines or other things.
+
+## Notes on Goals:
+
 I achieved all goals that I made, except for intentionally leaving out payment and the leaderboard system. The payment will not be added here, as that contains actually API keys I can't disclose, and so would make the local version quite difficult. The leaderboard system was avoided as that is actually skewed against the rules of a spelling bee, where the spellers can technically compete before the competition. However, since I left these stretch goals out, I decided to make the editing and audio/file components of the application more robust, which I hope makes up for it. The ability to edit posts, templates, schedules and other things is quite neat, and I did not think about adding that before.

@@ -20,8 +20,8 @@ const RegisterForm = () => {
         case "auth/email-already-in-use":
           setError("The email address is already in use by another account.");
           break;
-        case "auth/invalid-email":
-          setError("The email address is not valid.");
+        case "auth/invalid-credential":
+          setError("The email address or password is not valid.");
           break;
         case "auth/operation-not-allowed":
           setError("Email/password accounts are not enabled.");
@@ -30,7 +30,7 @@ const RegisterForm = () => {
           setError("The password is too weak.");
           break;
         default:
-          setError("An unknown error occurred. Please try again.");
+          setError(err.message);
       }
     }
   };

@@ -28,8 +28,12 @@ const LoginForm = () => {
         case "auth/wrong-password":
           setError("Incorrect password."); // Set error message for wrong password
           break;
+        case "auth/invalid-credential":
+          setError("The email address or password is not valid.");
+          break;
+
         default:
-          setError("An unexpected error occurred. Please try again."); // Set error message for any other errors
+          setError(err.message); // Set error message for any other errors
       }
     }
   };
