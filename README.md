@@ -21,11 +21,10 @@ This video does not cover the majority of functionalities in the application. Th
 
 ## Usage
 
-There are three ways you can use this project:
+There are two ways you can use this project:
 
 1. A web browser via local deployment
 2. A web browser via [polycomb.jadenzhang.com](http://polycomb.jadenzhang.com)
-3. A desktop application (Windows only)
 
 ### A web browser via local deployment
 
@@ -149,10 +148,7 @@ Now you have successfully locally deployed Polycomb! Feel free to explore, techn
 
 A web browser via polycomb.jadenzhang.com
 Go to your browser of choice and enter “polycomb.jadenzhang.com”
+Do all previous steps for the local hosting, but only for "server"
+The web browser will need your locally hosted backend to run! (Backend hosting on the cloud is expensive and/or time consuming)
 
 Voila! You have successfully accessed Polycomb via a browser from my website!
-
-A desktop application
-In the repository: https://github.com/Jantomz/polycomb, the right hand side has a “releases” section. Click on the release, and download the correct version. This should be an executable for windows operating system.
-
-Once the download is complete, locate the .exe file and double click it. This will go through the correct steps and successfully open the application!
