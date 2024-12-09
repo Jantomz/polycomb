@@ -47,7 +47,7 @@ function App() {
   const { getUser, createUser } = useApi(); // Destructure API functions
 
   const [userData, setUserData] = useState(null); // State to store user data
-  const [loading, setLoading] = useState(true); // State to manage loading state
+  const [loading, setLoading] = useState(false); // State to manage loading state
   const [error, setError] = useState(null); // State to manage error messages
 
   useEffect(() => {
@@ -96,7 +96,7 @@ function App() {
   };
 
   if (loading) {
-    return <Loading />; // Show loading component while data is being fetched
+    return <Loading />; // Show loading component while fetching user data
   }
 
   if (error) {
