@@ -86,7 +86,7 @@ I have pre-created an admin account for demo purposes. Here are the account logi
 
 Please avoid spamming accounts, it does not pose any risks to the system, the only thing it does is take up MongoDB’s server space…
 
-Now you have successfully locally deployed Polycomb! Feel free to explore. Technical design choices as well as a thorough rundown of the application will be explained in `Design.md`.
+Now you have successfully locally deployed Polycomb! Feel free to explore. Technical design choices as well as a thorough rundown of the application will be explained in `DESIGN.md`.
 
 ### A web browser via polycomb.jadenzhang.com
 
@@ -126,7 +126,7 @@ Open up your vscode and open a new folder. Now, open your terminal in VSCode, an
 
 Now, press enter in your terminal, and you should see a progress bar quickly cloning the repository. In essence, we are just copy-pasting the folders and files from the repository on github’s servers to your local machine. Once the cloning is complete, you should see in your file viewer in VSCode, that there are the two folders “app” and “server” as well as this README.md.
 
-Go ahead and explore the folders if you’d like, though Design.md will explain the file structure and design choices. Note that I have pushed the .env file without any protection. You can take a look inside, there are a few secrets that I am happy to leak to the public, though under normal circumstances you should avoid doing so. I am aware of this push and have done it intentionally to make it easier for local deployment of the backend. However, I have a separate branch that is deployed on the web we can discuss later, and the .env is hidden there.
+Go ahead and explore the folders if you’d like, though DESIGN.md will explain the file structure and design choices. Note that I have pushed the .env file without any protection. You can take a look inside, there are a few secrets that I am happy to leak to the public, though under normal circumstances you should avoid doing so. I am aware of this push and have done it intentionally to make it easier for local deployment of the backend. However, I have a separate branch that is deployed on the web we can discuss later, and the .env is hidden there.
 
 Now, in your terminal, make sure you are in the directory that has the folders “app” and “server”. On the right side of the terminal, you should see a plus sign that you can click to create another instance of the terminal. In one of the terminals, type “cd app” and in the other, type “cd server”. These will open the folders from each separate terminal and thus allow local deployment from both. In both terminals, type “npm i.” There is a file called package.json that holds all necessary dependencies for the project to deploy properly. Thus, you are using node package manager to install all the dependencies listed in that file. Note that you must have nodeJs installed to run this command. If you need to install nodeJs, do so here https://nodejs.org/en/download/package-manager.
 
@@ -144,7 +144,7 @@ Password: HelloCS50TF
 
 Please avoid spamming accounts, it does not pose any risks to the system, the only thing it does is take up MongoDB’s server space…
 
-Now you have successfully locally deployed Polycomb! Feel free to explore, technical design choices as well as a thorough rundown of the application will be explained in Design.md and a video demo is available at the top of this README.md.
+Now you have successfully locally deployed Polycomb! Feel free to explore, technical design choices as well as a thorough rundown of the application will be explained in DESIGN.md and a video demo is available at the top of this README.md.
 
 A web browser via polycomb.jadenzhang.com
 Go to your browser of choice and enter “polycomb.jadenzhang.com”

@@ -31,6 +31,35 @@ const createTemplate = async (req, res) => {
     return res.status(400).json({ error: "Request body is missing or empty" }); // Validate request body
   }
 
+  if (!req.body.fields || !Array.isArray(req.body.fields)) {
+    return res
+      .status(400)
+      .json({ error: "Fields are missing or not an array" });
+  }
+
+  for (const field of req.body.fields) {
+    if (!field.name || !field.type) {
+      return res
+        .status(400)
+        .json({ error: "Each field must have a name and a type" });
+    }
+  }
+
+  const allowedTypes = ["text", "email", "number", "date"];
+  if (req.body.fields && Array.isArray(req.body.fields)) {
+    for (const field of req.body.fields) {
+      if (!allowedTypes.includes(field.type)) {
+        return res
+          .status(400)
+          .json({ error: `Invalid field type: ${field.type}` });
+      }
+    }
+  } else {
+    return res
+      .status(400)
+      .json({ error: "Fields are missing or not an array" });
+  }
+
   try {
     const template = new Template(req.body); // Create new template instance
     await template.save(); // Save template to database

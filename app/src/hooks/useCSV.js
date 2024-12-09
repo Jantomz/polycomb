@@ -1,5 +1,8 @@
 const useCSV = () => {
   const parseCSV = async (csv) => {
+    if (!csv || !csv.name.endsWith(".csv")) {
+      throw new Error("Provided file is not a CSV");
+    }
     try {
       const text = await csv.text(); // Read the CSV file as text
       const lines = String(text).split("\n"); // Split the text into lines
